@@ -1,7 +1,10 @@
 package org.frc3512.robot;
 
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends LoggedRobot {
@@ -14,40 +17,11 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void robotInit(){
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
-  @Override
-  public void disabledPeriodic() {}
+    // Start AdvantageKit logger
+    Logger.start();
 
-  @Override
-  public void disabledExit() {}
-
-  @Override
-  public void autonomousInit() {}
-
-  @Override
-  public void autonomousPeriodic() {}
-
-  @Override
-  public void autonomousExit() {}
-
-  @Override
-  public void teleopInit() {}
-
-  @Override
-  public void teleopPeriodic() {}
-
-  @Override
-  public void teleopExit() {}
-
-  @Override
-  public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
   }
-
-  @Override
-  public void testPeriodic() {}
-
-  @Override
-  public void testExit() {}
 }

@@ -1,4 +1,4 @@
-package org.frc3512.robot.subsytems.main.arm;
+package org.frc3512.robot.subsytems.superstructure.arm;
 
 import org.frc3512.robot.util.SubsystemDataProcessor;
 import org.littletonrobotics.junction.AutoLog;
@@ -13,8 +13,6 @@ public interface ArmIO extends SubsystemDataProcessor.IODataRefresher{
         public double appliedVolts;
         public double supplyCurrent;
         public double statorCurrent;
-        public double angularVelocity;
-        public double angularAcceleration;
         public double motorTemp;
 
     }

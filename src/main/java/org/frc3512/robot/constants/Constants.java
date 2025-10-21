@@ -24,7 +24,6 @@ public class Constants {
     public static final double kA = 25;
 
     public static final double GEAR_RATIO = 23.0 * (45.0 / 12.0);
-    public static final double ARM_POSITION_COEFFICIENT = 2 * Math.PI / GEAR_RATIO;
 
   }
 
@@ -35,6 +34,8 @@ public class Constants {
     public static final double kP = 1.5;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
+
+    public static final double kG = 0.4;
 
     public static final double PULLEY_CIRCUMFERENCE = 1.8798 * Math.PI;
     public static final double GEAR_RATIO = 50.0 / 11.0;

@@ -1,4 +1,4 @@
-package org.frc3512.robot.subsytems.main.arm;
+package org.frc3512.robot.subsytems.superstructure.arm;
 
 public enum ArmStates{
 
@@ -6,7 +6,7 @@ public enum ArmStates{
     // negative = forward
     
     // * Defualt
-    STOW(0.0, "Stow"),
+    STOW(0.0, "Stowed"),
 
     // * Coral 
 
@@ -38,7 +38,11 @@ public enum ArmStates{
     PROCESS(-75, "Processing"),
 
     // | Barge
-    BARGE(15, "Barging");
+    BARGE(15, "Barging"),
+
+    // * Testing
+    FRONT(-40, "Front"),
+    BACK(40, "Back");
 
     public double position;
     public String state;
