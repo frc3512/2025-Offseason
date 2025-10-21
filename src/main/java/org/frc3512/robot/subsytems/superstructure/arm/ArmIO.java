@@ -6,7 +6,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ArmIO extends SubsystemDataProcessor.IODataRefresher{
 
     @AutoLog
-    class ArmIOInputs {
+    public class ArmIOInputs {
 
         public double armAngle;
 

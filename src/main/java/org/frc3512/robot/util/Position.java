@@ -5,13 +5,13 @@ import org.frc3512.robot.subsytems.superstructure.elevator.ElevatorStates;
 import org.frc3512.robot.subsytems.superstructure.wrist.WristStates;
 
 
-public class PositionSetter {
+public class Position {
 
     private ElevatorStates wantedElevatorState;
     private ArmStates wantedArmState;
     private WristStates wantedWristState;
 
-    public PositionSetter(
+    public Position(
         ElevatorStates wantedElevatorState, 
         ArmStates wantedArmState,
         WristStates wantedWristState) {
@@ -22,16 +22,16 @@ public class PositionSetter {
 
     }
 
-    public double getWantedElevatorState() {
-        return wantedElevatorState.position;
+    public ElevatorStates getWantedElevatorState() {
+        return wantedElevatorState;
     }
 
-    public double getWantedArmState() {
-        return wantedArmState.position;
+    public ArmStates getWantedArmState() {
+        return wantedArmState;
     }
 
-    public double getWantedWristState() {
-        return wantedWristState.position;
+    public WristStates getWantedWristState() {
+        return wantedWristState;
     }
     
 }
