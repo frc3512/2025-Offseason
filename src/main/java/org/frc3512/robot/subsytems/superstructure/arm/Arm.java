@@ -2,13 +2,14 @@ package org.frc3512.robot.subsytems.superstructure.arm;
 
 import org.frc3512.robot.subsytems.superstructure.arm.ArmIO.ArmIOInputs;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase{
 
     private final ArmIO io;
-    private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+    private final ArmIOInputs inputs = new ArmIOInputs();
 
     private ArmStates desiredState = ArmStates.STOW;
 
@@ -45,7 +46,7 @@ public class Arm extends SubsystemBase{
 
         io.updateInputes(inputs);
 
-        Logger.processInputs("Arm", inputs);
+        Logger.processInputs("Arm", (LoggableInputs) inputs);
     }
 
     public void applyStates() {

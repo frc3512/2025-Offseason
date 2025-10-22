@@ -1,95 +1,52 @@
 package org.frc3512.robot.subsytems.superstructure.wrist;
 
-import org.frc3512.robot.constants.Constants.WristConstants;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
+public class Wrist extends SubsystemBase{
 
-public class Wrist implements WristIO{
+    private WristIO io;
+    private WristIO.WristIOInputs inputs = new WristIO.WristIOInputs();
 
-    private TalonFX motor;
+    private WristStates desiredState = WristStates.STOW;
 
-    PositionVoltage positionRequest = new PositionVoltage(WristStates.STOW.position);
+    public static Wrist instance;
 
-    private final StatusSignal<Angle> position;
-    private final StatusSignal<Voltage> voltage;
-    private final StatusSignal<Current> supplyCurrent;
-    private final StatusSignal<Current> statorCurrent;
-    private final StatusSignal<Temperature> temperature;
-    private final StatusSignal<AngularVelocity> angularVelocity;
-    private final StatusSignal<AngularAcceleration> angularAcceleration;
-
-    public Wrist() {
-
-        motor = new TalonFX(16);
-
-        TalonFXConfiguration config = new TalonFXConfiguration();
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimit = 20.0;
-        config.CurrentLimits.StatorCurrentLimit = 20.0;
-
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-        config.Feedback.SensorToMechanismRatio = WristConstants.GEAR_RATIO;
-
-        config.Slot0.withKP(WristConstants.kP);
-
-        position = motor.getPosition();
-        voltage = motor.getMotorVoltage();
-        supplyCurrent = motor.getSupplyCurrent();
-        statorCurrent = motor.getStatorCurrent();
-        temperature = motor.getDeviceTemp();
-        angularVelocity = motor.getRotorVelocity();
-        angularAcceleration = motor.getAcceleration();
-
-        motor.setPosition(0.000000);
-
+    public static Wrist setInstance(WristIO io) {
+        instance = new Wrist(io);
+        return instance;
     }
 
-    @Override
-    public void updateInputes(WristIOInputs inputs) {
-
-        inputs.wristAngle = position.getValueAsDouble() * 360;
-
-        inputs.appliedVolts = voltage.getValueAsDouble();
-        inputs.supplyCurrent = supplyCurrent.getValueAsDouble();
-        inputs.statorCurrent = statorCurrent.getValueAsDouble();
-        inputs.motorTemp = temperature.getValueAsDouble();
-
+    public static Wrist getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Wrist subsystem not initialized yet.");
+        }
+        return instance;
     }
 
-    @Override
     public void setDesiredState(WristStates target) {
-        motor.setControl(
-            positionRequest.withPosition(target.position / 360.0));
+        this.desiredState = target;
+    }
 
+    public Wrist(WristIO io) {
+        this.io = io;
     }
 
     @Override
-    public void refreshData() {
-        BaseStatusSignal.refreshAll(
-            position,
-            voltage,
-            supplyCurrent,
-            statorCurrent,
-            temperature,
-            angularVelocity,
-            angularAcceleration
-        );
+    public void periodic() {
+
+        applyStates();
+
+        io.updateInputes(inputs);
+
+        Logger.processInputs("Wrist", (LoggableInputs) inputs);
+
+    }
+
+    public void applyStates() {
+        io.setDesiredState(desiredState);
     }
     
 }
