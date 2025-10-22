@@ -1,7 +1,6 @@
 package org.frc3512.robot.subsytems.superstructure.elevator;
 
 import org.frc3512.robot.constants.Constants.ElevatorConstants;
-import org.frc3512.robot.subsytems.superstructure.elevator.ElevatorIO.ElevatorIOInputs;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;

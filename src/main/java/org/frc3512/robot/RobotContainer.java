@@ -5,6 +5,7 @@ import org.frc3512.robot.subsytems.superstructure.arm.ArmIOTalonFX;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+@SuppressWarnings("unused")
 public class RobotContainer {
 
   // * Create subsytem objects

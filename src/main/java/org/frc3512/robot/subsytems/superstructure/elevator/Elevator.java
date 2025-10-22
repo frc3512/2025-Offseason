@@ -35,6 +35,10 @@ public class Elevator extends SubsystemBase{
         this.io = io;
     }
 
+    public ElevatorIO getElevatorIO() {
+        return io;
+    }
+
     @Override
     public void periodic() {
 

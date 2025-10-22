@@ -34,6 +34,10 @@ public class Wrist extends SubsystemBase{
         this.io = io;
     }
 
+    public WristIO getWristIO() {
+        return io;
+    }
+
     @Override
     public void periodic() {
 
