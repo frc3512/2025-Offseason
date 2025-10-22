@@ -17,7 +17,7 @@ public interface ElevatorIO extends SubsystemDataProcessor.IODataRefresher{
 
     }
 
-    default void setPosition(ElevatorStates target)  {}
+    default void setDesiredState(ElevatorStates target)  {}
 
     default void updateInputes(ElevatorIOInputs inputs) {}
 

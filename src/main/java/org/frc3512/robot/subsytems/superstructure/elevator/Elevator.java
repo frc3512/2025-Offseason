@@ -83,7 +83,7 @@ public class Elevator implements ElevatorIO{
     }
 
     @Override
-    public void setPosition(ElevatorStates target) {
+    public void setDesiredState(ElevatorStates target) {
         leadMotor.setControl(
             positionRequest.withPosition(target.position / ElevatorConstants.PULLEY_CIRCUMFERENCE));
         

@@ -7,27 +7,26 @@ import org.frc3512.robot.subsytems.superstructure.wrist.WristStates;
 
 public class Position {
 
-    private ElevatorStates wantedElevatorState;
     private ArmStates wantedArmState;
+    private ElevatorStates wantedElevatorState;
     private WristStates wantedWristState;
 
     public Position(
-        ElevatorStates wantedElevatorState, 
         ArmStates wantedArmState,
+        ElevatorStates wantedElevatorState, 
         WristStates wantedWristState) {
 
-         this.wantedElevatorState = wantedElevatorState;
-         this.wantedArmState = wantedArmState;
-         this.wantedWristState = wantedWristState;   
-
+        this.wantedArmState = wantedArmState;
+        this.wantedElevatorState = wantedElevatorState;
+        this.wantedWristState = wantedWristState;   
     }
-
-    public ElevatorStates getWantedElevatorState() {
-        return wantedElevatorState;
-    }
-
+   
     public ArmStates getWantedArmState() {
         return wantedArmState;
+    }
+    
+    public ElevatorStates getWantedElevatorState() {
+        return wantedElevatorState;
     }
 
     public WristStates getWantedWristState() {

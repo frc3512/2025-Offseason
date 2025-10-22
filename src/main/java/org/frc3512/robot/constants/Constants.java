@@ -24,6 +24,7 @@ public class Constants {
     public static final double kA = 25;
 
     public static final double GEAR_RATIO = 23.0 * (45.0 / 12.0);
+    public static final double TOLERANCE = 5; // 5 degress of tolerance
 
   }
 
@@ -39,6 +40,8 @@ public class Constants {
 
     public static final double PULLEY_CIRCUMFERENCE = 1.8798 * Math.PI;
     public static final double GEAR_RATIO = 50.0 / 11.0;
+
+    public static final double TOLERANCE = 1; // 1 inch of tolerance
   }
 
   public static class WristConstants {
@@ -49,6 +52,8 @@ public class Constants {
     public static final double GEAR_RATIO = 10.178;
     
     public static final int motorID = 16;
+
+    public static final double TOLERANCE = 5; // 5 degrees of tolerance to allow contact with hardstops while not being to restrictive
   }
 
   public static class VisionConstants {
