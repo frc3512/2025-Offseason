@@ -21,6 +21,8 @@ public interface ArmIO extends SubsystemDataProcessor.IODataRefresher{
 
     default void updateInputes(ArmIOInputs inputs) {}
 
+    default double getPosition() {return 0.0;} 
+
     @Override
     default void refreshData() {}
    

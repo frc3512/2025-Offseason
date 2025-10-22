@@ -30,68 +30,20 @@ public class StateMachine extends SubsystemBase{
     private final ElevatorIO elevatorIO;
     private final WristIO wristIO;
 
-    private final ArmIOInputsAutoLogged armInputs = new ArmIOInputsAutoLogged();
-    private final ElevatorIOInputsAutoLogged elevatorInputs = new ElevatorIOInputsAutoLogged();
-    private final WristIOInputsAutoLogged wristInputs = new WristIOInputsAutoLogged();
 
     public StateMachine(ArmIO armIO, ElevatorIO elevatorIO, WristIO wristIO) {
 
         this.armIO = armIO;
-        this.armIO = armIO;
+        this.elevatorIO = elevatorIO;
         this.wristIO = wristIO;
 
         wantedPosition = States.STOWED;
 
-        SubsystemDataProcessor.createAndStartSubsystemDataProcessor(
-                () -> {
-                    synchronized (armInputs) {
-                        synchronized (elevatorInputs) {
-                            synchronized (wristInputs) {
-                                armIO.updateInputs(armInputs);
-                                elevatorIO.updateInputs(elevatorInputs);
-                                wristIO.updateInputs(wristInputs);
-                            }
-                        }
-                    }
-                },   
-
-            armIO,
-            elevatorIO,
-            wristIO
-
-        );
     }
 
     @Override
     public void periodic() {
-
-        synchronized (armInputs) {
-            synchronized (elevatorInputs) {
-                synchronized (wristInputs) {
-                    Logger.processInputs("Subsystems/Superstructure/Arm", armInputs);
-                    Logger.processInputs("Subsystems/Superstructure/Elevator", elevatorInputs);
-                    Logger.processInputs("Subsystems/Superstructure/Wrist", wristInputs);
-
-                    Logger.recordOutput("Subsystems/Superstructure/ReachedSetpoint", atSetpoint());
-
-                    ArmStates wantedArmPos;
-                    ElevatorStates wantedElevatorPos;
-                    WristStates wantedWristPos;
-
-                    if (wantedPosition != null) {
-                        wantedArmPos = wantedPosition.getWantedArmState();
-                        wantedElevatorPos = wantedPosition.getWantedElevatorState();
-                        wantedWristPos = wantedPosition.getWantedWristState();
-                        Logger.recordOutput("Subsystems/Superstructure/Wanted Arm Pos", wantedArmPos);
-                        Logger.recordOutput("Subsystems/Superstructure/Wanted Elevator Pos", wantedElevatorPos);
-                        Logger.recordOutput("Subsystems/Superstructure/Wanted Wrist Pos", wantedWristPos);
-                    }
-
-                    applyStates(wantedPosition);
-
-                }
-            }
-        }
+        applyStates(wantedPosition);
     }
 
     public void applyStates(Position position) {
@@ -102,27 +54,4 @@ public class StateMachine extends SubsystemBase{
 
     }
 
-    public boolean reachedSetpoint() {
-
-        synchronized(armInputs) {
-            synchronized(elevatorInputs) {
-                synchronized(wristInputs) {
-
-                    return MathUtil.isNear(
-                            wantedPosition.getWantedArmState(), 
-                            armInputs.armAngle,
-                            ArmConstants.TOLERANCE)
-                        && MathUtil.isNear(
-                            wantedPosition.getWantedElevatorState(),
-                            elevatorInputs.elevatorHeight, 
-                            ElevatorConstants.TOLERANCE)
-                        && MathUtil.isNear(
-                            wantedPosition.getWantedWristState(),
-                            wristInputs.wristAngle, 
-                            WristConstants.TOLERANCE);
-
-                }
-            }
-        }
-    }
 }

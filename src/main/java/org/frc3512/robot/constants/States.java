@@ -13,5 +13,45 @@ public class States {
             ArmStates.STOW,
                 ElevatorStates.STOW,
                     WristStates.STOW);
+    
+    // | Coral Positions
+    public static final Position INTAKING_CORAL =
+        new Position(
+            ArmStates.INTAKE_CORAL,
+                ElevatorStates.INTAKE,
+                    WristStates.INTAKE);
+
+    public static final Position PREP_CORAL = 
+        new Position(
+            ArmStates.HOLD_CORAL,
+                ElevatorStates.PREP_CORAL, 
+                    WristStates.CORAL);
+
+    public static final Position PREP_L2 = 
+        new Position(
+            ArmStates.PREP_MID,
+                ElevatorStates.L2,
+                    WristStates.CORAL);
+
+    public static final Position PREP_L3 = 
+        new Position(
+            ArmStates.PREP_MID,
+                ElevatorStates.L3,
+                    WristStates.CORAL);   
+
+    public static final Position PREP_L4 = 
+        new Position(
+            ArmStates.PREP_L4,
+                ElevatorStates.L4,
+                    WristStates.CORAL);
+
+    public static final Position PLACE_L2 = 
+        new Position(
+            ArmStates.PLACE_MID,
+                ElevatorStates.L2,
+                    WristStates.CORAL);
+
+    public static final Position PLACE_L3 = 
+        new 
 
 }
