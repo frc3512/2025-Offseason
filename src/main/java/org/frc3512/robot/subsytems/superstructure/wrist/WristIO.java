@@ -15,6 +15,8 @@ public interface WristIO extends SubsystemDataProcessor.IODataRefresher{
         public double statorCurrent;
         public double motorTemp;
 
+        public String state;
+
     }
 
     default void setDesiredState(WristStates target)  {}

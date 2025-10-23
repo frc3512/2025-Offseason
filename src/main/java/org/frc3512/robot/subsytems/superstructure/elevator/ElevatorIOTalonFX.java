@@ -26,6 +26,8 @@ public class ElevatorIOTalonFX implements ElevatorIO{
 
     PositionVoltage positionRequest = new PositionVoltage(ElevatorStates.STOW.position);
 
+    private ElevatorStates desiredState = ElevatorStates.STOW;
+
     private final StatusSignal<Angle> position;
     private final StatusSignal<Voltage> voltage;
     private final StatusSignal<Current> supplyCurrent;
@@ -80,6 +82,8 @@ public class ElevatorIOTalonFX implements ElevatorIO{
         inputs.statorCurrent = statorCurrent.getValueAsDouble();
         inputs.motorTemp = temperature.getValueAsDouble();
 
+        inputs.state = desiredState.state;
+
     }
 
     @Override
@@ -91,6 +95,7 @@ public class ElevatorIOTalonFX implements ElevatorIO{
             new Follower(
                 leadMotor.getDeviceID(), true));
 
+        desiredState = target;
     }
 
     @Override

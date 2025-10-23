@@ -16,6 +16,19 @@ public class StateMachine extends SubsystemBase{
     private final ElevatorIO elevatorIO;
     private final WristIO wristIO;
 
+    private static StateMachine instance;
+
+    public static StateMachine getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("State Machine not initialized yet.");
+        }
+        return instance;
+    }
+
+    public static StateMachine setInstance(ArmIO armIO, ElevatorIO elevatorIO, WristIO wristIO) {
+        instance = new StateMachine(armIO, elevatorIO, wristIO);
+        return instance;
+    }
 
     public StateMachine(ArmIO armIO, ElevatorIO elevatorIO, WristIO wristIO) {
 
