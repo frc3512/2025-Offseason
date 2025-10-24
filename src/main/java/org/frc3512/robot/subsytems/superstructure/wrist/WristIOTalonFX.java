@@ -31,8 +31,6 @@ public class WristIOTalonFX implements WristIO{
     private final StatusSignal<AngularVelocity> angularVelocity;
     private final StatusSignal<AngularAcceleration> angularAcceleration;
 
-    private WristStates desiredState = WristStates.STOW;
-
     public WristIOTalonFX() {
 
         motor = new TalonFX(16);
@@ -72,16 +70,12 @@ public class WristIOTalonFX implements WristIO{
         inputs.statorCurrent = statorCurrent.getValueAsDouble();
         inputs.motorTemp = temperature.getValueAsDouble();
 
-        // inputs.state = desiredState.state; JAYDEN FIX THIS ITS NOT MY PROBLEM - OLIVER
-
     }
 
     @Override
     public void setDesiredState(WristStates target) {
         motor.setControl(
             positionRequest.withPosition(target.position / 360.0));
-
-        desiredState = target;
 
     }
 

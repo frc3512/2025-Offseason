@@ -33,8 +33,6 @@ public class ArmIOTalonFX implements ArmIO{
     private final StatusSignal<AngularVelocity> angularVelocity;
     private final StatusSignal<AngularAcceleration> angularAcceleration;
 
-    private ArmStates desiredState = ArmStates.STOW;
-
     public ArmIOTalonFX() {
 
         motor = new TalonFX(16);
@@ -82,16 +80,12 @@ public class ArmIOTalonFX implements ArmIO{
         inputs.statorCurrent = statorCurrent.getValueAsDouble();
         inputs.motorTemp = temperature.getValueAsDouble();
 
-        // inputs.state = desiredState.state; JAYDEN FIX THIS ITS NOT MY PROBLEM - OLIVER
-
     }
 
     @Override
     public void setDesiredState(ArmStates target) {
         motor.setControl(
             positionRequest.withPosition(target.position / 360.0));
-
-        desiredState = target;
     }
 
     @Override

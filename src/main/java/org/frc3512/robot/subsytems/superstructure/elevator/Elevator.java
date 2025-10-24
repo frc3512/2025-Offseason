@@ -1,8 +1,6 @@
 package org.frc3512.robot.subsytems.superstructure.elevator;
 
-import org.frc3512.robot.subsytems.superstructure.elevator.ElevatorIO.ElevatorIOInputs;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
