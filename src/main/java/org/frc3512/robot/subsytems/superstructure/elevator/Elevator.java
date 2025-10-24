@@ -6,10 +6,10 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Elevator extends SubsystemBase{
+public class Elevator extends SubsystemBase {
 
     private final ElevatorIO io;
-    private final ElevatorIOInputs inputs = new ElevatorIOInputs();
+    private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
     private ElevatorStates desiredState = ElevatorStates.STOW;
 
@@ -46,7 +46,7 @@ public class Elevator extends SubsystemBase{
 
         io.updateInputes(inputs);
 
-        Logger.processInputs("Elevator", (LoggableInputs) inputs);
+        Logger.processInputs("Elevator", inputs);
 
     }
 

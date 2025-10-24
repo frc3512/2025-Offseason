@@ -73,7 +73,7 @@ public class ModeControls {
         return new Trigger(() -> this.currentMode == Mode.ALGAE);
     }
 
-    // Coral Mode
+    // * Coral Mode
     public Trigger intakeCoral() {
         return modeSpecific(ControlBoard.getInstance().intakeCoral(), Mode.CORAL);
     }
@@ -98,7 +98,7 @@ public class ModeControls {
         return modeSpecific(ControlBoard.getInstance().score(), Mode.CORAL);
     }
 
-    // Algae Mode
+    // * Algae Mode
     public Trigger intakeAlgae() {
         return modeSpecific(ControlBoard.getInstance().intakeAlgae(), Mode.ALGAE);
     }
@@ -119,7 +119,7 @@ public class ModeControls {
         return modeSpecific(ControlBoard.getInstance().process(), Mode.ALGAE);
     }
 
-    // Vision
+    // * Vision
     public Trigger allignLeft() {
         return modeSpecific(ControlBoard.getInstance().allignLeft(), Mode.CORAL);
     }
