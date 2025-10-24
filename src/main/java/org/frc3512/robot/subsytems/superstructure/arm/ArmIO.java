@@ -15,13 +15,13 @@ public interface ArmIO extends SubsystemDataProcessor.IODataRefresher{
         public double statorCurrent;
         public double motorTemp;
 
-        public String state;
+        public int state;
 
     }
 
     default void setDesiredState(ArmStates target)  {}
 
-    default void updateInputes(ArmIOInputs inputs) {}
+    default void updateInputs(ArmIOInputs inputs) {}
 
     default double getPosition() {return 0.0;} 
 

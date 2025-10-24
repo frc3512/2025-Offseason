@@ -15,13 +15,12 @@ public interface ElevatorIO extends SubsystemDataProcessor.IODataRefresher{
         public double statorCurrent;
         public double motorTemp;
 
-        public String state;
-
+        public int state;
     }
 
     default void setDesiredState(ElevatorStates target)  {}
 
-    default void updateInputes(ElevatorIOInputs inputs) {}
+    default void updateInputs(ElevatorIOInputs inputs) {}
 
     @Override
     default void refreshData() {}

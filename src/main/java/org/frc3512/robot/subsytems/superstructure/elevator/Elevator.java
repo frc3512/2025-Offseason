@@ -44,7 +44,7 @@ public class Elevator extends SubsystemBase {
 
         applyStates();
 
-        io.updateInputes(inputs);
+        io.updateInputs(inputs);
 
         Logger.processInputs("Elevator", inputs);
 

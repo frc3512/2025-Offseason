@@ -15,13 +15,12 @@ public interface WristIO extends SubsystemDataProcessor.IODataRefresher{
         public double statorCurrent;
         public double motorTemp;
 
-        public String state;
-
+        public int state;
     }
 
     default void setDesiredState(WristStates target)  {}
 
-    default void updateInputes(WristIOInputs inputs) {}
+    default void updateInputs(WristIOInputs inputs) {}
 
     @Override
     default void refreshData() {}

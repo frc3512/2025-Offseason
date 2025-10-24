@@ -73,7 +73,7 @@ public class ArmIOTalonFX implements ArmIO{
     }
 
     @Override
-    public void updateInputes(ArmIOInputs inputs) {
+    public void updateInputs(ArmIOInputs inputs) {
 
         inputs.armAngle = position.getValueAsDouble() * 360;
 
@@ -82,7 +82,7 @@ public class ArmIOTalonFX implements ArmIO{
         inputs.statorCurrent = statorCurrent.getValueAsDouble();
         inputs.motorTemp = temperature.getValueAsDouble();
 
-        inputs.state = desiredState.state;
+        // inputs.state = desiredState.state; JAYDEN FIX THIS ITS NOT MY PROBLEM - OLIVER
 
     }
 

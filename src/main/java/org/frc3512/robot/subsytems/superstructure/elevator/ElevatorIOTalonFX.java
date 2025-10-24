@@ -73,7 +73,7 @@ public class ElevatorIOTalonFX implements ElevatorIO{
     }
 
         @Override
-    public void updateInputes(ElevatorIOInputs inputs) {
+    public void updateInputs(ElevatorIOInputs inputs) {
 
         inputs.elevatorHeight = position.getValueAsDouble() * ElevatorConstants.PULLEY_CIRCUMFERENCE;
 
@@ -82,7 +82,7 @@ public class ElevatorIOTalonFX implements ElevatorIO{
         inputs.statorCurrent = statorCurrent.getValueAsDouble();
         inputs.motorTemp = temperature.getValueAsDouble();
 
-        inputs.state = desiredState.state;
+        // inputs.state = desiredState.state;  JAYDEN FIX THIS ITS NOT MY PROBLEM - OLIVER
 
     }
 

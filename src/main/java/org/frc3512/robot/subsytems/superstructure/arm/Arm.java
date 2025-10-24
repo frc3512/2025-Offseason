@@ -44,7 +44,7 @@ public class Arm extends SubsystemBase {
 
         applyStates();
 
-        io.updateInputes(inputs);
+        io.updateInputs(inputs);
 
         Logger.processInputs("Arm", inputs);
     }

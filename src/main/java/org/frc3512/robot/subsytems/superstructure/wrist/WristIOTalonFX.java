@@ -63,7 +63,7 @@ public class WristIOTalonFX implements WristIO{
     }
 
     @Override
-    public void updateInputes(WristIOInputs inputs) {
+    public void updateInputs(WristIOInputs inputs) {
 
         inputs.wristAngle = position.getValueAsDouble() * 360;
 
@@ -72,7 +72,7 @@ public class WristIOTalonFX implements WristIO{
         inputs.statorCurrent = statorCurrent.getValueAsDouble();
         inputs.motorTemp = temperature.getValueAsDouble();
 
-        inputs.state = desiredState.state;
+        // inputs.state = desiredState.state; JAYDEN FIX THIS ITS NOT MY PROBLEM - OLIVER
 
     }
 

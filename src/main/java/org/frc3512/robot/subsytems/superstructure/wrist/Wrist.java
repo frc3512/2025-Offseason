@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Wrist extends SubsystemBase {
 
     private WristIO io;
-    private WristIOInputsAutoLogged inputs = new WristIO.WristIOInputsAutoLogged();
+    private WristIOInputsAutoLogged inputs = new WristIOInputsAutoLogged();
 
     private WristStates desiredState = WristStates.STOW;
 
@@ -43,7 +43,7 @@ public class Wrist extends SubsystemBase {
 
         applyStates();
 
-        io.updateInputes(inputs);
+        io.updateInputs(inputs);
 
         Logger.processInputs("Wrist", (LoggableInputs) inputs);
 
