@@ -5,10 +5,10 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Wrist extends SubsystemBase{
+public class Wrist extends SubsystemBase {
 
     private WristIO io;
-    private WristIO.WristIOInputs inputs = new WristIO.WristIOInputs();
+    private WristIOInputsAutoLogged inputs = new WristIO.WristIOInputsAutoLogged();
 
     private WristStates desiredState = WristStates.STOW;
 

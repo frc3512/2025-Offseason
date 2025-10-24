@@ -6,10 +6,10 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Arm extends SubsystemBase{
+public class Arm extends SubsystemBase {
 
     private final ArmIO io;
-    private final ArmIOInputs inputs = new ArmIOInputs();
+    private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
     private ArmStates desiredState = ArmStates.STOW;
 
@@ -46,7 +46,7 @@ public class Arm extends SubsystemBase{
 
         io.updateInputes(inputs);
 
-        Logger.processInputs("Arm", (LoggableInputs) inputs);
+        Logger.processInputs("Arm", inputs);
     }
 
     public void applyStates() {

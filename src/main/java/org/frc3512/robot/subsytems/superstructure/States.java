@@ -4,11 +4,37 @@ public enum States {
     
     STOW,
 
-    L1,
-    L2,
-    L3,
-    L4,
+    // CORAL
+    INTAKE_CORAL,
 
-    INTAKE;
+    PREP_TROUGH,
+
+    PREP_L2,
+    PREP_L3,
+
+    PREP_L4,
+
+    PLACE_TROUGH,
+
+    PLACE_L2,
+    PLACE_L3,
+
+    PLACE_L4,
+
+    // ALGAE
+    INTAKE_ALGAE,
+
+    PREP,
+
+    DE_REEF_A1,
+    DE_REEF_A2,
+
+    PREP_BARGE,
+
+    PLACE_BARGE,
+
+    PREP_PROCESSOR,
+
+    PLACE_PROCESSOR;
 
 }
