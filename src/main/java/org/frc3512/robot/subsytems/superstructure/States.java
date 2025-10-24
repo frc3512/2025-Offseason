@@ -24,17 +24,15 @@ public enum States {
     // ALGAE
     INTAKE_ALGAE,
 
-    PREP,
+    HOLD_ALGAE,
 
     DE_REEF_A1,
     DE_REEF_A2,
 
     PREP_BARGE,
 
-    PLACE_BARGE,
-
     PREP_PROCESSOR,
 
-    PLACE_PROCESSOR;
+    EJECT;
 
 }
