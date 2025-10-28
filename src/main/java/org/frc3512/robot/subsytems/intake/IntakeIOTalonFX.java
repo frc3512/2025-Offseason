@@ -10,107 +10,110 @@ import com.reduxrobotics.sensors.canandcolor.ColorData;
 import com.reduxrobotics.sensors.canandcolor.ProximityPeriod;
 
 public class IntakeIOTalonFX implements IntakeIO {
-    
-    private final TalonFX motor;
-    private final TalonFXConfiguration config;
 
-    private final Canandcolor sensor;
-    private final CanandcolorSettings settings;
+  private final TalonFX motor;
+  private final TalonFXConfiguration config;
 
-    public IntakeIOTalonFX() {
+  private final Canandcolor sensor;
+  private final CanandcolorSettings settings;
 
-        motor = new TalonFX(17);
+  public IntakeIOTalonFX() {
 
-        config = new TalonFXConfiguration();
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    motor = new TalonFX(17);
 
-        sensor = new Canandcolor(31);
-        settings = new CanandcolorSettings();
+    config = new TalonFXConfiguration();
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        settings.setColorFramePeriod(0.040);
-        settings.setLampLEDBrightness(0.35);
-        settings.setAlignColorFramesToIntegrationPeriod(true);
-        settings.setProximityIntegrationPeriod(ProximityPeriod.k20ms);
+    sensor = new Canandcolor(31);
+    settings = new CanandcolorSettings();
 
-        motor.getConfigurator().apply(config);
-        sensor.setSettings(settings);
+    settings.setColorFramePeriod(0.040);
+    settings.setLampLEDBrightness(0.35);
+    settings.setAlignColorFramesToIntegrationPeriod(true);
+    settings.setProximityIntegrationPeriod(ProximityPeriod.k20ms);
 
+    motor.getConfigurator().apply(config);
+    sensor.setSettings(settings);
+  }
+
+  public double getObjectDistance() {
+    return sensor.getProximity();
+  }
+
+  @Override
+  public boolean hasCoral() {
+    if (getObjectDistance() <= 0.04) {
+      if (getR() >= 0
+          && getR() <= 0.06
+          && getG() >= 0
+          && getG() <= 0.06
+          && getB() >= 0
+          && getB() <= 0.06) {
+
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
+  }
 
-    public double getObjectDistance() {
-        return sensor.getProximity();
+  // fix-me
+  @Override
+  public boolean hasAlgae() {
+    if (getObjectDistance() <= 0.05) {
+      if (getR() >= 0.07
+          && getR() <= 0.13
+          && getG() >= 0.27
+          && getG() <= 0.34
+          && getB() >= 0.09
+          && getB() <= 0.15) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
+  }
 
-    @Override
-    public boolean hasCoral() {
-        if (getObjectDistance() <= 0.04) {
-            if (getR() >= 0 && getR() <= 0.06 &&
-                getG() >= 0 && getG() <= 0.06 && 
-                getB() >= 0 && getB() <= 0.06) {
-                    
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;            
-        }
-    }
+  public ColorData getColor() {
+    return sensor.getColor();
+  }
 
-    // fix-me
-    @Override
-    public boolean hasAlgae() {
-        if (getObjectDistance() <= 0.05) {
-            if (getR() >= 0.07 && getR() <= 0.13 && 
-                getG() >= 0.27 && getG() <= 0.34 && 
-                getB() >= 0.09 && getB() <= 0.15) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;            
-        }
-    }
+  public double getR() {
+    return sensor.getRed();
+  }
 
-    public ColorData getColor() {
-        return sensor.getColor();
-    }
+  public double getG() {
+    return sensor.getGreen();
+  }
 
-    public double getR() {
-        return sensor.getRed();
-    }
+  public double getB() {
+    return sensor.getBlue();
+  }
 
-    public double getG() {
-        return sensor.getGreen();
-    }
+  public void setSpeed(double speed) {
+    motor.set(speed);
+  }
 
-    public double getB() {
-        return sensor.getBlue();
-    }
+  @Override
+  public void updateInputs(IntakeIOInputs inputs) {
 
-    public void setSpeed(double speed) {
-        motor.set(speed);
-    }
+    inputs.objectDistance = getObjectDistance();
 
-    @Override
-    public void updateInputs(IntakeIOInputs inputs) {
+    inputs.hasCoral = hasCoral();
+    inputs.hasAlgae = hasAlgae();
 
-        inputs.objectDistance = getObjectDistance();
+    inputs.red = getR();
+    inputs.green = getG();
+    inputs.blue = getB();
+  }
 
-        inputs.hasCoral = hasCoral();
-        inputs.hasAlgae = hasAlgae();
-
-        inputs.red = getR();
-        inputs.green = getG();
-        inputs.blue = getB();
-    }
-
-    @Override
-    public void setDesiredState(IntakeStates target) {
-        setSpeed(target.speed);
-    }
-
+  @Override
+  public void setDesiredState(IntakeStates target) {
+    setSpeed(target.speed);
+  }
 }
-

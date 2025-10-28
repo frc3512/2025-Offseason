@@ -5,108 +5,113 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class GamepadButtonControlBoard implements IButtonControlBoard {
 
-    private static GamepadButtonControlBoard instance = null;
+  private static GamepadButtonControlBoard instance = null;
 
-    public static GamepadButtonControlBoard getInstance() {
-        if (instance == null) {
-            instance = new GamepadButtonControlBoard();
-        }
-        return instance;
+  public static GamepadButtonControlBoard getInstance() {
+    if (instance == null) {
+      instance = new GamepadButtonControlBoard();
     }
+    return instance;
+  }
 
-    private final CommandXboxController controller;
+  private final CommandXboxController controller;
 
-    private GamepadButtonControlBoard() {
-        controller = new CommandXboxController(0);
-    }
-    
-    // * Stow
-    @Override
-    public Trigger reset() {
-        return controller.povDown();
-    }
-    
-    // * Coral
-    @Override
-    public Trigger intakeCoral() {
-        return controller.rightTrigger();
-    }
-    @Override
-    public Trigger L1() {
-        return controller.b();
-    }
+  private GamepadButtonControlBoard() {
+    controller = new CommandXboxController(0);
+  }
 
-    @Override
-    public Trigger L2() {
-        return controller.a();
-    }
+  // * Stow
+  @Override
+  public Trigger stow() {
+    return controller.povDown();
+  }
 
-    @Override
-    public Trigger L3() {
-        return controller.x();
-    }
+  @Override
+  public Trigger gyro() {
+    return controller.rightStick();
+  }
 
-    @Override
-    public Trigger L4() {
-        return controller.y();
-    }
+  // * Coral
+  @Override
+  public Trigger intakeCoral() {
+    return controller.rightTrigger();
+  }
 
-    @Override
-    public Trigger score() {
-        return controller.leftTrigger();
-    }
+  @Override
+  public Trigger L1() {
+    return controller.b();
+  }
 
-    // * Algae
-    @Override
-    public Trigger intakeAlgae() {
-        return controller.rightBumper();
-    }
+  @Override
+  public Trigger L2() {
+    return controller.a();
+  }
 
-    @Override
-    public Trigger deReefA1() {
-        return controller.a();
-    }
+  @Override
+  public Trigger L3() {
+    return controller.x();
+  }
 
-    @Override
-    public Trigger deReefA2() {
-        return controller.y();
-    }
+  @Override
+  public Trigger L4() {
+    return controller.y();
+  }
 
-    @Override
-    public Trigger barge() {
-        return controller.x();
-    }
+  @Override
+  public Trigger score() {
+    return controller.leftTrigger();
+  }
 
-    @Override
-    public Trigger process() {
-        return controller.b();
-    }
+  // * Algae
+  @Override
+  public Trigger intakeAlgae() {
+    return controller.rightBumper();
+  }
 
-    // * Vision
-    @Override
-    public Trigger allignLeft() {
-        return controller.leftBumper();
-    }
+  @Override
+  public Trigger deReefA1() {
+    return controller.a();
+  }
 
-    @Override
-    public Trigger allignRight() {
-        return controller.rightBumper();
-    }
+  @Override
+  public Trigger deReefA2() {
+    return controller.y();
+  }
 
-    @Override
-    public Trigger allignAlgae() {
-        return controller.rightBumper().and(controller.leftBumper());
-    }
+  @Override
+  public Trigger barge() {
+    return controller.x();
+  }
 
-    // * Mode Switching
-    @Override
-    public Trigger setCoralMode() {
-        return controller.start();
-    }
+  @Override
+  public Trigger process() {
+    return controller.b();
+  }
 
-    @Override
-    public Trigger setAlgaeMode() {
-        return controller.back();
-    }
-    
+  // * Vision
+  @Override
+  public Trigger allignLeft() {
+    return controller.leftBumper();
+  }
+
+  @Override
+  public Trigger allignRight() {
+    return controller.rightBumper();
+  }
+
+  @Override
+  public Trigger allignAlgae() {
+    return controller.rightBumper().and(controller.leftBumper());
+  }
+
+  // * Mode Switching
+  @Override
+  public Trigger setCoralMode() {
+    return controller.start();
+  }
+
+  @Override
+  public Trigger setAlgaeMode() {
+    return controller.back();
+  }
 }

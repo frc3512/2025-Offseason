@@ -4,42 +4,44 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public interface IButtonControlBoard {
 
-    // * Stow
-    Trigger reset();
+  // * Stow
+  Trigger stow();
 
-    // * Coral
-    Trigger intakeCoral();
+  Trigger gyro();
 
-    Trigger L1();
+  // * Coral
+  Trigger intakeCoral();
 
-    Trigger L2();
+  Trigger L1();
 
-    Trigger L3();
+  Trigger L2();
 
-    Trigger L4();
+  Trigger L3();
 
-    Trigger score();
-    
-    // * Algae
-    Trigger intakeAlgae();
+  Trigger L4();
 
-    Trigger deReefA1();
+  Trigger score();
 
-    Trigger deReefA2();
+  // * Algae
+  Trigger intakeAlgae();
 
-    Trigger barge();
+  Trigger deReefA1();
 
-    Trigger process();
+  Trigger deReefA2();
 
-    // * Vision
-    Trigger allignLeft();
+  Trigger barge();
 
-    Trigger allignRight();
+  Trigger process();
 
-    Trigger allignAlgae();
+  // * Vision
+  Trigger allignLeft();
 
-    // * Mode Switching
-    Trigger setCoralMode();
+  Trigger allignRight();
 
-    Trigger setAlgaeMode();
+  Trigger allignAlgae();
+
+  // * Mode Switching
+  Trigger setCoralMode();
+
+  Trigger setAlgaeMode();
 }

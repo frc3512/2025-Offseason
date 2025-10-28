@@ -4,42 +4,39 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class GamepadDriveControlBoard implements IDriveControlBoard {
-    private static GamepadDriveControlBoard instance = null;
+  private static GamepadDriveControlBoard instance = null;
 
-    public static GamepadDriveControlBoard getInstance() {
-        if (instance == null) {
-            instance = new GamepadDriveControlBoard();
-        }
-
-        return instance;
+  public static GamepadDriveControlBoard getInstance() {
+    if (instance == null) {
+      instance = new GamepadDriveControlBoard();
     }
 
-    private final CommandXboxController controller;
+    return instance;
+  }
 
-    private GamepadDriveControlBoard() {
-        controller = new CommandXboxController(0);
-    }
+  private final CommandXboxController controller;
 
-    @Override
-    public double getThrottle() {
-        return -(Math.pow(Math.abs(controller.getLeftY()), 1.5))
-                * Math.signum(controller.getLeftY());
-    }
+  private GamepadDriveControlBoard() {
+    controller = new CommandXboxController(0);
+  }
 
-    @Override
-    public double getStrafe() {
-        return -(Math.pow(Math.abs(controller.getLeftX()), 1.5))
-                * Math.signum(controller.getLeftX());
-    }
+  @Override
+  public double getThrottle() {
+    return -(Math.pow(Math.abs(controller.getLeftY()), 1.2)) * Math.signum(controller.getLeftY());
+  }
 
-    @Override
-    public double getRotation() {
-        return -(Math.pow(Math.abs(controller.getRightX()), 2.0))
-                * Math.signum(controller.getRightX());
-    }
+  @Override
+  public double getStrafe() {
+    return -(Math.pow(Math.abs(controller.getLeftX()), 1.2)) * Math.signum(controller.getLeftX());
+  }
 
-    @Override
-    public Trigger resetGyro() {
-        return controller.rightStick().and(controller.leftStick());
-    }
+  @Override
+  public double getRotation() {
+    return -(Math.pow(Math.abs(controller.getRightX()), 1.5)) * Math.signum(controller.getRightX());
+  }
+
+  @Override
+  public Trigger resetGyro() {
+    return controller.rightStick().and(controller.leftStick());
+  }
 }

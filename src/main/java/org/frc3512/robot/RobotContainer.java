@@ -1,77 +1,117 @@
 package org.frc3512.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
 import org.frc3512.robot.buttons.ControlBoard;
 import org.frc3512.robot.buttons.ModeControls;
-import org.frc3512.robot.constants.DriveConstants;
-import org.frc3512.robot.constants.DriveConstants.TunerSwerveDrivetrain;
-import org.frc3512.robot.subsytems.drive.Swerve;
-import org.frc3512.robot.subsytems.superstructure.StateMachine;
-import org.frc3512.robot.subsytems.superstructure.arm.Arm;
-import org.frc3512.robot.subsytems.superstructure.arm.ArmIOTalonFX;
-import org.frc3512.robot.subsytems.superstructure.elevator.Elevator;
-import org.frc3512.robot.subsytems.superstructure.elevator.ElevatorIOTalonFX;
-import org.frc3512.robot.subsytems.superstructure.wrist.Wrist;
-import org.frc3512.robot.subsytems.superstructure.wrist.WristIOTalonFX;
-
-import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.frc3512.robot.commands.DriveCommands;
+import org.frc3512.robot.constants.Constants.GeneralConstants;
+import org.frc3512.robot.constants.TunerConstants;
+import org.frc3512.robot.subsytems.arm.Arm;
+import org.frc3512.robot.subsytems.drive.Drive;
+import org.frc3512.robot.subsytems.drive.GyroIO;
+import org.frc3512.robot.subsytems.drive.GyroIOPigeon2;
+import org.frc3512.robot.subsytems.drive.ModuleIO;
+import org.frc3512.robot.subsytems.drive.ModuleIOSim;
+import org.frc3512.robot.subsytems.drive.ModuleIOTalonFX;
+import org.frc3512.robot.subsytems.elevator.Elevator;
+import org.frc3512.robot.subsytems.wrist.Wrist;
+import org.frc3512.robot.superstructure.Superstructure;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
-
-  private double maxSpeed = DriveConstants.maxSpeed;
-  private double maxAngularRate = DriveConstants.maxAngularRate;
 
   // * Create subsytem objects
   private Arm arm;
   private Elevator elevator;
   private Wrist wrist;
 
-  private Swerve drivetrain = DriveConstants.createDrivetrain();
-  
-  private StateMachine stateMachine;
+  private Drive drive;
 
-  private final SwerveRequest.FieldCentric drive =
-      new SwerveRequest.FieldCentric()
-          .withDeadband(maxSpeed * 0.1)
-          .withRotationalDeadband(maxAngularRate * 0.07) // * Add a 7% deadband
-          .withDriveRequestType(DriveRequestType.Velocity);
+  private Superstructure superstructure = new Superstructure();
 
   // * Create Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // * Create Buttons
-  private final ControlBoard buttons = ControlBoard.getInstance();
+  private final ModeControls buttons = ModeControls.getInstance();
+  private final ControlBoard controlBoard = ControlBoard.getInstance();
 
   // ? Create Vision
 
   public RobotContainer() {
 
-    // * Initialize Subsystems
-    Arm.setInstance(new ArmIOTalonFX());
-    arm = Arm.getInstance();
+    switch (GeneralConstants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                new ModuleIOTalonFX(TunerConstants.BackRight));
+        break;
 
-    Elevator.setInstance(new ElevatorIOTalonFX());
-    elevator = Elevator.getInstance();
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight));
+        break;
 
-    Wrist.setInstance(new WristIOTalonFX());
-    wrist = Wrist.getInstance();
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+        break;
+    }
 
     configureAxisActions();
-
   }
 
   private void configureAxisActions() {
-
-    drivetrain.setDefaultCommand(
-        drivetrain.applyRequest(
-            () ->
-                drive
-                    .withVelocityX(buttons.getThrottle() * maxSpeed)
-                    .withVelocityY(buttons.getStrafe() * maxSpeed)
-                    .withRotationalRate(buttons.getRotation() * maxAngularRate)));
+    // Default command, normal field-relative drive
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> controlBoard.getThrottle(),
+            () -> controlBoard.getStrafe(),
+            () -> controlBoard.getRotation()));
   }
-  
+
+  private void configureButtonBindings() {
+
+    // Reset gyro to 0° when B button is pressed
+    buttons
+        .gyro()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
+  }
+
+  private void configureBindings() {
+    buttons.configureBindings();
+  }
+
+  public Command getAutonomousCommand() {
+    return null;
+  }
 }

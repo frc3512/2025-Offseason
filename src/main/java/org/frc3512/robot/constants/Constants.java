@@ -13,9 +13,25 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public class Constants {
-  public static class GeneralConstants {}
+  public static class GeneralConstants {
+
+    public static final Mode simMode = Mode.SIM;
+    public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+
+    public static enum Mode {
+      /** Running on a real robot. */
+      REAL,
+
+      /** Running a physics simulator. */
+      SIM,
+
+      /** Replaying from a log file. */
+      REPLAY
+    }
+  }
 
   public static class ArmConstants {
     public static final double kP = 30;
@@ -25,7 +41,6 @@ public class Constants {
 
     public static final double GEAR_RATIO = 23.0 * (45.0 / 12.0);
     public static final double TOLERANCE = 5; // 5 degress of tolerance
-
   }
 
   public static class ElevatorConstants {
@@ -50,10 +65,11 @@ public class Constants {
     public static final double kD = 0.0;
 
     public static final double GEAR_RATIO = 10.178;
-    
+
     public static final int motorID = 16;
 
-    public static final double TOLERANCE = 5; // 5 degrees of tolerance to allow contact with hardstops while not being to restrictive
+    public static final double TOLERANCE =
+        5; // 5 degrees of tolerance to allow contact with hardstops while not being to restrictive
   }
 
   public static class VisionConstants {
@@ -68,7 +84,7 @@ public class Constants {
             Units.inchesToMeters(6.0), // Forward / Back
             Units.inchesToMeters(11), // Left / Right
             Units.inchesToMeters(10.5), // Height
-            new Rotation3d( 
+            new Rotation3d(
                 Units.degreesToRadians(0.0),
                 Units.degreesToRadians(0.0),
                 Units.degreesToRadians(0.0)));
@@ -79,9 +95,9 @@ public class Constants {
             Units.inchesToMeters(-11), // Left / Right
             Units.inchesToMeters(10.5), // Height
             new Rotation3d(
-              Units.degreesToRadians(0.0), 
-              Units.degreesToRadians(0.0), 
-              Units.degreesToRadians(0.0)));
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0),
+                Units.degreesToRadians(0.0)));
 
     public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(1, 1, 2);
     public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);

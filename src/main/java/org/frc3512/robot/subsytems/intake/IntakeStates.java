@@ -1,21 +1,19 @@
 package org.frc3512.robot.subsytems.intake;
 
 public enum IntakeStates {
+  INTAKE(-0.5),
 
-    INTAKE(-0.5),
+  EJECT(0.9),
 
-    EJECT(0.9),
+  PLACE(0.15),
 
-    PLACE(0.15),
+  HOLD(0.25),
 
-    HOLD(0.25),
+  STOPPED(0.0);
 
-    STOPPED(0.0);
-    
-    double speed;
+  double speed;
 
-    IntakeStates(double wantedSpeed) {
-        this.speed = wantedSpeed;
-    }
-    
+  IntakeStates(double wantedSpeed) {
+    this.speed = wantedSpeed;
+  }
 }

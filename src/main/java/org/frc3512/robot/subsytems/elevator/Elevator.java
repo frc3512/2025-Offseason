@@ -1,0 +1,52 @@
+package org.frc3512.robot.subsytems.elevator;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
+
+public class Elevator extends SubsystemBase {
+
+  private final ElevatorIO io;
+  private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
+
+  private ElevatorStates desiredState = ElevatorStates.STOW;
+
+  public static Elevator instance;
+
+  public static Elevator setInstance(ElevatorIO io) {
+    instance = new Elevator(io);
+    return instance;
+  }
+
+  public static Elevator getInstance() {
+    if (instance == null) {
+      throw new IllegalStateException("Elevator subsystem not initialized yet.");
+    }
+    return instance;
+  }
+
+  public void setDesiredState(ElevatorStates target) {
+    this.desiredState = target;
+  }
+
+  public Elevator(ElevatorIO io) {
+    this.io = io;
+  }
+
+  public ElevatorIO getElevatorIO() {
+    return io;
+  }
+
+  @Override
+  public void periodic() {
+
+    applyStates();
+
+    io.updateInputs(inputs);
+
+    Logger.processInputs("Elevator", inputs);
+  }
+
+  public void applyStates() {
+    io.setDesiredState(desiredState);
+  }
+}

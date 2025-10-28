@@ -12,9 +12,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
-import org.frc3512.robot.subsytems.drive.Swerve;
 
-public class DriveConstants {
+public class TunerConstants {
 
   private static final Slot0Configs steerGains =
       new Slot0Configs()
@@ -27,13 +26,7 @@ public class DriveConstants {
           .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
   private static final Slot0Configs driveGains =
-      new Slot0Configs()
-            .withKP(0.2)
-            .withKI(0)
-            .withKD(0)
-            .withKS(0)
-            .withKV(0.125)
-            .withKA(0);
+      new Slot0Configs().withKP(0.2).withKI(0).withKD(0).withKS(0).withKV(0.125).withKA(0);
 
   private static final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;
   private static final ClosedLoopOutputType kDriveClosedLoopOutput = ClosedLoopOutputType.Voltage;
@@ -63,8 +56,10 @@ public class DriveConstants {
 
   public static double maxSpeed = 5.2 * 0.65; // * Drive velocity in meters per second
   public static double maxAngularRate = 2.5; // * Controls how fast the robot quick turns
-  public static double slowSpeed = 5.2 * 0.25; // * Drive velocity for slow mode in meters per second
-  public static double slowAngularRate = 2.5 * 0.25; // * Controls how fast the robot quick turns in slow mode
+  public static double slowSpeed =
+      5.2 * 0.25; // * Drive velocity for slow mode in meters per second
+  public static double slowAngularRate =
+      2.5 * 0.25; // * Controls how fast the robot quick turns in slow mode
 
   private static final double kCoupleRatio = 3.5714285714285716;
   private static final double kDriveGearRatio = 6.122448979591837;
@@ -74,6 +69,10 @@ public class DriveConstants {
 
   private static final boolean kInvertLeftSide = false;
   private static final boolean kInvertRightSide = true;
+
+  // Theoretical free speed (m/s) at 12 V applied output;
+  // This needs to be tuned to your individual robot
+  public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(4.69);
 
   private static final int kPigeonId = 0;
 
@@ -217,10 +216,6 @@ public class DriveConstants {
               kBackRightSteerMotorInverted,
               kBackRightEncoderInverted);
 
-  public static Swerve createDrivetrain() {
-    return new Swerve(DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
-  }
-
   public static class TunerSwerveDrivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> {
 
     public TunerSwerveDrivetrain(
@@ -262,4 +257,3 @@ public class DriveConstants {
     }
   }
 }
-
