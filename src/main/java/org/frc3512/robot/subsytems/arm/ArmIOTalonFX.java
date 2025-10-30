@@ -69,7 +69,6 @@ public class ArmIOTalonFX implements ArmIO {
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
-
     inputs.armAngle = position.getValueAsDouble() * 360;
 
     inputs.appliedVolts = voltage.getValueAsDouble();

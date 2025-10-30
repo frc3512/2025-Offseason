@@ -26,6 +26,8 @@ public interface ArmIO extends SubsystemDataProcessor.IODataRefresher {
     return 0.0;
   }
 
+  default void updateSim() {}
+
   @Override
   default void refreshData() {}
 }

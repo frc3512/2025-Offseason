@@ -22,6 +22,8 @@ public interface WristIO extends SubsystemDataProcessor.IODataRefresher {
 
   default void updateInputs(WristIOInputs inputs) {}
 
+  default void updateSim() {}
+
   @Override
   default void refreshData() {}
 }

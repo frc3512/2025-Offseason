@@ -5,13 +5,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-
 import org.frc3512.robot.buttons.ControlBoard;
 import org.frc3512.robot.buttons.ModeControls;
 import org.frc3512.robot.commands.DriveCommands;
 import org.frc3512.robot.constants.Constants.GeneralConstants;
 import org.frc3512.robot.constants.TunerConstants;
 import org.frc3512.robot.subsytems.arm.Arm;
+import org.frc3512.robot.subsytems.arm.ArmIOSim;
 import org.frc3512.robot.subsytems.drive.Drive;
 import org.frc3512.robot.subsytems.drive.GyroIO;
 import org.frc3512.robot.subsytems.drive.GyroIOPigeon2;
@@ -19,16 +19,21 @@ import org.frc3512.robot.subsytems.drive.ModuleIO;
 import org.frc3512.robot.subsytems.drive.ModuleIOSim;
 import org.frc3512.robot.subsytems.drive.ModuleIOTalonFX;
 import org.frc3512.robot.subsytems.elevator.Elevator;
+import org.frc3512.robot.subsytems.elevator.ElevatorIOSim;
+import org.frc3512.robot.subsytems.intake.Intake;
+import org.frc3512.robot.subsytems.intake.IntakeIOSim;
 import org.frc3512.robot.subsytems.wrist.Wrist;
+import org.frc3512.robot.subsytems.wrist.WristIOSim;
 import org.frc3512.robot.superstructure.Superstructure;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
 
-  // * Create subsytem objects
   private Arm arm;
   private Elevator elevator;
   private Wrist wrist;
+
+  private Intake intake;
 
   private Drive drive;
 
@@ -38,7 +43,9 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // * Create Buttons
+  // For actual mode spedific buttons
   private final ModeControls buttons = ModeControls.getInstance();
+  // For all robot modes
   private final ControlBoard controlBoard = ControlBoard.getInstance();
 
   // ? Create Vision
@@ -66,6 +73,19 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
+        Arm.setInstance(new ArmIOSim());
+        arm = Arm.getInstance();
+
+        Elevator.setInstance(new ElevatorIOSim());
+        elevator = Elevator.getInstance();
+
+        Wrist.setInstance(new WristIOSim());
+        wrist = Wrist.getInstance();
+
+        Intake.setInstance(new IntakeIOSim());
+        intake = Intake.getInstance();
+
         break;
 
       default:
@@ -84,6 +104,7 @@ public class RobotContainer {
   }
 
   private void configureAxisActions() {
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -96,7 +117,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     // Reset gyro to 0° when B button is pressed
-    buttons
+    controlBoard
         .gyro()
         .onTrue(
             Commands.runOnce(

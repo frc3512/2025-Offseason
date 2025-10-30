@@ -22,6 +22,8 @@ public interface ElevatorIO extends SubsystemDataProcessor.IODataRefresher {
 
   default void updateInputs(ElevatorIOInputs inputs) {}
 
+  default void updateSim() {}
+
   @Override
   default void refreshData() {}
 }

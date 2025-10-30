@@ -2,16 +2,12 @@ package org.frc3512.robot.superstructure;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.frc3512.robot.subsytems.arm.Arm;
-import org.frc3512.robot.subsytems.arm.ArmIO;
 import org.frc3512.robot.subsytems.arm.ArmStates;
 import org.frc3512.robot.subsytems.elevator.Elevator;
-import org.frc3512.robot.subsytems.elevator.ElevatorIO;
 import org.frc3512.robot.subsytems.elevator.ElevatorStates;
 import org.frc3512.robot.subsytems.intake.Intake;
-import org.frc3512.robot.subsytems.intake.IntakeIO;
 import org.frc3512.robot.subsytems.intake.IntakeStates;
 import org.frc3512.robot.subsytems.wrist.Wrist;
-import org.frc3512.robot.subsytems.wrist.WristIO;
 import org.frc3512.robot.subsytems.wrist.WristStates;
 
 public class StateMachine extends SubsystemBase {
@@ -27,7 +23,16 @@ public class StateMachine extends SubsystemBase {
   private Intake intake = Intake.getInstance();
   private IntakeStates currentIntakeState;
 
-  public StateMachine(ArmIO armIO, ElevatorIO elevatorIO, WristIO wristIO, IntakeIO intakeIO) {}
+  // Add booleans to keep track of if we have preped a socriong state yet
+  Boolean preppedTrough = false;
+  Boolean preppedL2 = false;
+  Boolean preppedL3 = false;
+  Boolean preppedL4 = false;
+
+  Boolean preppedBarge = false;
+  Boolean preppedProcessor = false;
+
+  public StateMachine() {}
 
   public void handleStateTransitions(States wantedState) {
 
@@ -43,6 +48,7 @@ public class StateMachine extends SubsystemBase {
       case PREP_TROUGH:
         if (intake.getIntakeIO().hasCoral() && !intake.getIntakeIO().hasAlgae()) {
           currentState = States.PLACE_TROUGH;
+          preppedTrough = true;
         }
     }
   }
