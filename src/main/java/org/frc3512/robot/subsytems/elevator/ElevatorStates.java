@@ -18,7 +18,7 @@ public enum ElevatorStates {
 
   // | Intake
   INTAKE(11, "Intaking Coral"),
-  PREP_CORAL(0, "Preping Coral"),
+  PREP_CORAL(3, "Preping Coral"),
 
   // * Algae
 

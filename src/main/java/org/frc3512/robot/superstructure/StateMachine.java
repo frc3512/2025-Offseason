@@ -35,14 +35,20 @@ public class StateMachine extends SubsystemBase {
 
     switch (wantedState) {
 
-        // --- MAIN ---
+      // --- MAIN ---
       case STOW:
         if (!Intake.getInstance().getIntakeIO().hasAlgae() && 
             !Intake.getInstance().getIntakeIO().hasCoral()) {
           currentState = States.STOW;
         }
 
-        // --- CORAL LOGIC ---
+      // --- CORAL LOGIC ---
+      case PREP_CORAL:
+        if (!Intake.getInstance().getIntakeIO().hasAlgae() && 
+            Intake.getInstance().getIntakeIO().hasCoral()) {
+          currentState = States.PREP_CORAL;
+        }
+      
       case INTAKE_CORAL:
         if (!Intake.getInstance().getIntakeIO().hasAlgae() && 
             !Intake.getInstance().getIntakeIO().hasCoral()) {
@@ -186,6 +192,12 @@ public class StateMachine extends SubsystemBase {
         currentWristState = WristStates.INTAKE;
         currentIntakeState = IntakeStates.INTAKE;
 
+      case PREP_CORAL:
+        currentArmState = ArmStates.HOLD_CORAL;
+        currentElevatorState = ElevatorStates.PREP_CORAL;
+        currentWristState = WristStates.CORAL;
+        currentIntakeState = IntakeStates.STOPPED;
+
       case PREP_TROUGH:
         currentArmState = ArmStates.TROUGH;
         currentElevatorState = ElevatorStates.TROUGH;
@@ -264,7 +276,7 @@ public class StateMachine extends SubsystemBase {
         currentWristState = WristStates.ALGAE;
         currentIntakeState = IntakeStates.HOLD;
 
-        // Leave subsystem states as they are to allow for ejection at either barge or processor
+      // Leave subsystem states as they are to allow for ejection at either barge or processor
       case EJECT:
         currentIntakeState = IntakeStates.EJECT;
     }
@@ -280,5 +292,9 @@ public class StateMachine extends SubsystemBase {
     applyStates();
 
     Logger.recordOutput("Arm State", currentArmState.state);
+    Logger.recordOutput("Elevator State", currentElevatorState.state);
+    Logger.recordOutput("Wrist State", currentWristState.state);
+
+    Logger.recordOutput("Intake State", currentIntakeState.speed);
   }
 }

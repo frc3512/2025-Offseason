@@ -11,7 +11,7 @@ public enum IntakeStates {
 
   STOPPED(0.0);
 
-  double speed;
+  public double speed;
 
   IntakeStates(double wantedSpeed) {
     this.speed = wantedSpeed;

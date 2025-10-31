@@ -6,6 +6,8 @@ public enum States {
   // CORAL
   INTAKE_CORAL,
 
+  PREP_CORAL,
+
   PREP_TROUGH,
 
   PREP_L2,

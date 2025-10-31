@@ -137,6 +137,14 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+    // Mode Switcher
+    switchToCoral()
+        .onTrue(
+            Commands.runOnce(() -> setMode(driverMode.CORAL)));
+    switchToAlgae()
+        .onTrue(
+            Commands.runOnce(() -> setMode(driverMode.ALGAE)));
+
   }
 
   private void configureBindings() {
@@ -160,9 +168,6 @@ public class RobotContainer {
   }
 
   //  * Define triggers here
-  // private Trigger modeSpecific(Trigger trigger, driverMode mode) {
-  //   return trigger.and(new Trigger(() -> this.currentMode == mode));
-  // }
 
   // Swerve
   // Use exponential joystick for more acceleration control
@@ -190,10 +195,127 @@ public class RobotContainer {
     return controller.povDown();
   }
 
-  // Test trigger to test my thory of better buttons
+  // Mode Switcher
+  private Trigger switchToCoral() {
+    return controller.start();
+  }
+
+  private Trigger switchToAlgae() {
+    return controller.back();
+  }
+
+  //  --- CORAL ---
+  private Trigger intakeCoral() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.leftTrigger();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger l1() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.b();
+    } else {
+      return null;
+    }
+  }
+
   private Trigger l2() {
     if (currentMode == driverMode.CORAL) {
       return controller.a();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger l3() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.x();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger l4() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.y();
+    } else {
+      return null;
+    }
+  }
+
+  // Score method in superstructure will need logic to determoine if we score on mid or l4, because they 
+  // will have differnt scoring methods due to differnt branch shapes
+  private Trigger score() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.rightTrigger();
+    } else {
+      return null;
+    }
+  }
+
+  // --- ALGAE ---
+  private Trigger intakeAlgae() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.leftTrigger();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger deReefA1() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.a();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger deReefA2() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.y();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger process() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.b();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger barge() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.x();
+    } else {
+      return null;
+    }
+  }
+
+  // Vision - Implement after IO if fully working
+  private Trigger allignLeft() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.leftBumper();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger allignRight() {
+    if (currentMode == driverMode.CORAL) {
+      return controller.rightBumper();
+    } else {
+      return null;
+    }
+  }
+
+  private Trigger allignAlgae() {
+    if (currentMode == driverMode.ALGAE) {
+      return controller.leftBumper();
     } else {
       return null;
     }
