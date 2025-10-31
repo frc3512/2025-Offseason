@@ -1,5 +1,11 @@
 package org.frc3512.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.frc3512.robot.commands.DriveCommands;
 import org.frc3512.robot.constants.Constants.GeneralConstants;
 import org.frc3512.robot.constants.TunerConstants;
@@ -26,13 +32,6 @@ import org.frc3512.robot.subsytems.wrist.WristIO;
 import org.frc3512.robot.subsytems.wrist.WristIOSim;
 import org.frc3512.robot.subsytems.wrist.WristIOTalonFX;
 import org.frc3512.robot.superstructure.Superstructure;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -123,10 +122,7 @@ public class RobotContainer {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
-            drive,
-            () -> getThrottle(),
-            () -> getStrafe(),
-            () -> getRotation()));
+            drive, () -> getThrottle(), () -> getStrafe(), () -> getRotation()));
   }
 
   private void configureButtonBindings() {
@@ -202,5 +198,4 @@ public class RobotContainer {
       return null;
     }
   }
-
 }

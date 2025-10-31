@@ -12,20 +12,11 @@ public class Arm extends SubsystemBase {
 
   public static Arm instance;
 
-  public static Arm setInstance(ArmIO io) {
-    instance = new Arm(io);
-    return instance;
-  }
-
   public static Arm getInstance() {
     if (instance == null) {
       throw new IllegalStateException("Arm subsystem not initialized yet.");
     }
     return instance;
-  }
-
-  public void setDesiredState(ArmStates target) {
-    this.desiredState = target;
   }
 
   public Arm(ArmIO io) {
@@ -44,6 +35,10 @@ public class Arm extends SubsystemBase {
     io.updateInputs(inputs);
 
     Logger.processInputs("Arm", inputs);
+  }
+
+  public void setDesiredState(ArmStates target) {
+    this.desiredState = target;
   }
 
   public void applyStates() {

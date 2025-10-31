@@ -14,8 +14,6 @@ public interface ArmIO extends SubsystemDataProcessor.IODataRefresher {
     public double supplyCurrent;
     public double statorCurrent;
     public double motorTemp;
-
-    public int state;
   }
 
   default void setDesiredState(ArmStates target) {}

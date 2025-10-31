@@ -35,6 +35,9 @@ public enum ElevatorStates {
   // | Barge
   BARGE(60, "Barging"),
 
+  // | Processor
+  PROCESSOR(8, "Processing"),
+
   // * Testing
   TEST_1(25, "Testing");
 
