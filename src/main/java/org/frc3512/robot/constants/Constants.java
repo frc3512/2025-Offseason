@@ -1,5 +1,15 @@
 package org.frc3512.robot.constants;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -11,6 +21,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -56,7 +67,36 @@ public class Constants {
     public static final double PULLEY_CIRCUMFERENCE = 1.8798 * Math.PI;
     public static final double GEAR_RATIO = 50.0 / 11.0;
 
-    public static final double TOLERANCE = 1; // 1 inch of tolerance
+    public static final DCMotor simMotor = DCMotor.getFalcon500(2);
+
+    public static final double minHeight = 0.0; // Inches
+    public static final double maxHeight = 56.0; // Inches
+    public static final double heightTolerance = 1.0; // Inches
+
+    public static final TalonFXConfiguration config =
+      new TalonFXConfiguration()
+        .withMotorOutput(
+            new MotorOutputConfigs()
+                .withInverted(InvertedValue.CounterClockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Brake))
+        .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO))
+        .withMotionMagic(
+            new MotionMagicConfigs()
+                .withMotionMagicCruiseVelocity(100) // 100 inches per second
+                .withMotionMagicAcceleration(
+                    200) // 200 inches per second squared
+            )
+        .withSlot0(
+            new Slot0Configs()
+              .withKP(kP)
+              .withKG(kG)
+              .withGravityType(GravityTypeValue.Elevator_Static))
+        .withCurrentLimits(
+            new CurrentLimitsConfigs()
+                .withSupplyCurrentLimit(60)
+                .withStatorCurrentLimit(80)
+                .withSupplyCurrentLimitEnable(true)
+                .withStatorCurrentLimitEnable(true));
   }
 
   public static class WristConstants {
@@ -68,8 +108,7 @@ public class Constants {
 
     public static final int motorID = 16;
 
-    public static final double TOLERANCE =
-        5; // 5 degrees of tolerance to allow contact with hardstops while not being to restrictive
+    public static final double TOLERANCE = 5; // 5 degrees of tolerance to allow contact with hardstops while not being to restrictive
   }
 
   public static class VisionConstants {

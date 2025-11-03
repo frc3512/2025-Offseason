@@ -1,29 +1,22 @@
 package org.frc3512.robot.subsytems.elevator;
 
-import org.frc3512.robot.util.SubsystemDataProcessor;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ElevatorIO extends SubsystemDataProcessor.IODataRefresher {
+public interface ElevatorIO {
 
   @AutoLog
-  class ElevatorIOInputs {
-
-    public double elevatorHeight;
-
-    public double appliedVolts;
-    public double supplyCurrent;
-    public double statorCurrent;
-    public double motorTemp;
-
-    public int state;
+  public static class ElevatorIOInputs {
+    public double motorVoltage = 0.0; // Volts
+    public double motorCurrent = 0.0; // Amps
+    public double motorPosition = 0.0; // Inches
+    public double motorVelocity = 0.0; // Inches per Second
+    public double motorAcceleration = 0.0; // Inches per Second Squared
+    public double positionSetpoint = 0.0; // Inches
   }
 
-  default void setDesiredState(ElevatorStates target) {}
+  public default void updateInputs(ElevatorIOInputs inputs) {}
 
-  default void updateInputs(ElevatorIOInputs inputs) {}
+  public default void changeSetpoint(ElevatorStates newSetpoint) {}
 
-  default void updateSim() {}
 
-  @Override
-  default void refreshData() {}
 }

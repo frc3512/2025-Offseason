@@ -1,100 +1,75 @@
 package org.frc3512.robot.subsytems.elevator;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import org.frc3512.robot.constants.Constants.ElevatorConstants;
+
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
-import org.frc3512.robot.constants.Constants.ElevatorConstants;
+
+import edu.wpi.first.math.MathUtil;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
 
   private TalonFX leadMotor;
   private TalonFX followMotor;
 
-  PositionVoltage positionRequest = new PositionVoltage(ElevatorStates.STOW.position);
-
-  private final StatusSignal<Angle> position;
-  private final StatusSignal<Voltage> voltage;
-  private final StatusSignal<Current> supplyCurrent;
-  private final StatusSignal<Current> statorCurrent;
-  private final StatusSignal<Temperature> temperature;
-  private final StatusSignal<AngularVelocity> angularVelocity;
-  private final StatusSignal<AngularAcceleration> angularAcceleration;
+  PositionVoltage setpoint = new PositionVoltage(ElevatorStates.STOW.position);
 
   public ElevatorIOTalonFX() {
 
+    // Motor Initialization
     leadMotor = new TalonFX(ElevatorConstants.frontMotorID);
     followMotor = new TalonFX(ElevatorConstants.backMotorID);
 
-    TalonFXConfiguration config = new TalonFXConfiguration();
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.CurrentLimits.SupplyCurrentLimit = 30.0;
-    config.CurrentLimits.StatorCurrentLimit = 80.0;
+    leadMotor.getConfigurator().apply(ElevatorConstants.config);
+    followMotor.getConfigurator().apply(ElevatorConstants.config);
 
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    // Optimize Can Bus Utilization
+    var motorVoltageSignal = leadMotor.getMotorVoltage();
+    var motorCurrentSignal = leadMotor.getSupplyCurrent();
+    var motorPositionSignal = leadMotor.getPosition();
+    var motorVelocitySignal = leadMotor.getVelocity();
+    var motorAccelerationSignal = leadMotor.getAcceleration();
 
-    config.Feedback.SensorToMechanismRatio = ElevatorConstants.GEAR_RATIO;
+    motorVoltageSignal.setUpdateFrequency(50);
+    motorCurrentSignal.setUpdateFrequency(50);
+    motorPositionSignal.setUpdateFrequency(50);
+    motorVelocitySignal.setUpdateFrequency(50);
+    motorAccelerationSignal.setUpdateFrequency(50);
 
-    config.Slot0.withKP(ElevatorConstants.kP);
-    config.Slot0.withKG(ElevatorConstants.kG);
-
-    config.Slot0.withGravityType(GravityTypeValue.Elevator_Static);
-
-    position = leadMotor.getPosition();
-    voltage = leadMotor.getMotorVoltage();
-    supplyCurrent = leadMotor.getSupplyCurrent();
-    statorCurrent = leadMotor.getStatorCurrent();
-    temperature = leadMotor.getDeviceTemp();
-    angularVelocity = leadMotor.getRotorVelocity();
-    angularAcceleration = leadMotor.getAcceleration();
-
-    leadMotor.getConfigurator().apply(config);
-    followMotor.getConfigurator().apply(config);
-
-    leadMotor.setPosition(0.0000000000);
+    leadMotor.optimizeBusUtilization();
+    followMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
 
-    inputs.elevatorHeight = position.getValueAsDouble() * ElevatorConstants.PULLEY_CIRCUMFERENCE;
-
-    inputs.appliedVolts = voltage.getValueAsDouble();
-    inputs.supplyCurrent = supplyCurrent.getValueAsDouble();
-    inputs.statorCurrent = statorCurrent.getValueAsDouble();
-    inputs.motorTemp = temperature.getValueAsDouble();
-  }
-
-  @Override
-  public void setDesiredState(ElevatorStates target) {
-    leadMotor.setControl(
-        positionRequest.withPosition(target.position / ElevatorConstants.PULLEY_CIRCUMFERENCE));
+    leadMotor.setControl(setpoint);
 
     followMotor.setControl(new Follower(leadMotor.getDeviceID(), true));
+
+    // Update inputs
+    inputs.motorVoltage = leadMotor.getMotorVoltage().getValueAsDouble();
+    inputs.motorCurrent = leadMotor.getSupplyCurrent().getValueAsDouble();
+    inputs.motorPosition =
+        leadMotor.getPosition().getValueAsDouble()
+            * ElevatorConstants.PULLEY_CIRCUMFERENCE; // Convert rotations to inches
+    inputs.motorVelocity =
+        leadMotor.getVelocity().getValueAsDouble()
+            * ElevatorConstants.PULLEY_CIRCUMFERENCE; // Convert rps to ips
+    inputs.motorAcceleration =
+        leadMotor.getAcceleration().getValueAsDouble()
+            * ElevatorConstants.PULLEY_CIRCUMFERENCE; // Convert rps^2 to ips^2
+    inputs.positionSetpoint =
+        setpoint.Position * ElevatorConstants.PULLEY_CIRCUMFERENCE; // Convert rotations to inches
   }
 
   @Override
-  public void refreshData() {
-    BaseStatusSignal.refreshAll(
-        position,
-        voltage,
-        supplyCurrent,
-        statorCurrent,
-        temperature,
-        angularVelocity,
-        angularAcceleration);
+  public void changeSetpoint(ElevatorStates newSetpoint) {
+    var inches =
+        MathUtil.clamp(
+            newSetpoint.position, ElevatorConstants.minHeight, ElevatorConstants.maxHeight);
+    setpoint.Position =
+        inches / ElevatorConstants.PULLEY_CIRCUMFERENCE; // Convert degrees to rotations
   }
 }

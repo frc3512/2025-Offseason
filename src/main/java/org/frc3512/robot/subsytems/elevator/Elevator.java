@@ -1,52 +1,34 @@
 package org.frc3512.robot.subsytems.elevator;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.frc3512.robot.constants.Constants.ElevatorConstants;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
 
-  private final ElevatorIO io;
-  private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-
-  private ElevatorStates desiredState = ElevatorStates.STOW;
-
-  public static Elevator instance;
-
-  public static Elevator setInstance(ElevatorIO io) {
-    instance = new Elevator(io);
-    return instance;
-  }
-
-  public static Elevator getInstance() {
-    if (instance == null) {
-      throw new IllegalStateException("Elevator subsystem not initialized yet.");
-    }
-    return instance;
-  }
-
-  public void setDesiredState(ElevatorStates target) {
-    this.desiredState = target;
-  }
+  private ElevatorIO io;
+  private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
   public Elevator(ElevatorIO io) {
     this.io = io;
   }
 
-  public ElevatorIO getElevatorIO() {
-    return io;
+  public Command changeSetpoint(ElevatorStates newSetpoint) {
+    return runOnce(() -> io.changeSetpoint(newSetpoint));
+  }
+
+  @AutoLogOutput(key = "MechanismStates/ElevatorAtSetpoint")
+  public boolean atSetpoint() {
+    return Math.abs(inputs.positionSetpoint - inputs.motorPosition)
+        < ElevatorConstants.heightTolerance;
   }
 
   @Override
   public void periodic() {
-
-    applyStates();
-
     io.updateInputs(inputs);
-
-    Logger.processInputs("Elevator", inputs);
-  }
-
-  public void applyStates() {
-    io.setDesiredState(desiredState);
+    Logger.processInputs("Elevator/", inputs);
   }
 }

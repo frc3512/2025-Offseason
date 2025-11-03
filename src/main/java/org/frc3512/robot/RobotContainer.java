@@ -44,7 +44,7 @@ public class RobotContainer {
 
   private Drive drive;
 
-  private Superstructure superstructure = new Superstructure();
+  private Superstructure superstructure = new Superstructure(elevator);
 
   // * Create Controller
   private final CommandXboxController controller = new CommandXboxController(0);
