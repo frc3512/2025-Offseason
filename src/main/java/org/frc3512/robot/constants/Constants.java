@@ -1,15 +1,12 @@
 package org.frc3512.robot.constants;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -45,6 +42,8 @@ public class Constants {
   }
 
   public static class ArmConstants {
+    public static final int ID = 15;
+
     public static final double kP = 30;
     public static final double kI = 0.0;
     public static final double kD = 0;
@@ -52,6 +51,17 @@ public class Constants {
 
     public static final double GEAR_RATIO = 23.0 * (45.0 / 12.0);
     public static final double TOLERANCE = 5; // 5 degress of tolerance
+
+    public static final DCMotor simMotor = DCMotor.getFalcon500(1);
+
+    public static final TalonFXConfiguration config =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.Clockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Brake))
+            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO))
+            .withSlot0(new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKA(kA));
   }
 
   public static class ElevatorConstants {
@@ -74,29 +84,17 @@ public class Constants {
     public static final double heightTolerance = 1.0; // Inches
 
     public static final TalonFXConfiguration config =
-      new TalonFXConfiguration()
-        .withMotorOutput(
-            new MotorOutputConfigs()
-                .withInverted(InvertedValue.CounterClockwise_Positive)
-                .withNeutralMode(NeutralModeValue.Brake))
-        .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO))
-        .withMotionMagic(
-            new MotionMagicConfigs()
-                .withMotionMagicCruiseVelocity(100) // 100 inches per second
-                .withMotionMagicAcceleration(
-                    200) // 200 inches per second squared
-            )
-        .withSlot0(
-            new Slot0Configs()
-              .withKP(kP)
-              .withKG(kG)
-              .withGravityType(GravityTypeValue.Elevator_Static))
-        .withCurrentLimits(
-            new CurrentLimitsConfigs()
-                .withSupplyCurrentLimit(60)
-                .withStatorCurrentLimit(80)
-                .withSupplyCurrentLimitEnable(true)
-                .withStatorCurrentLimitEnable(true));
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.Clockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Brake))
+            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO))
+            .withSlot0(
+                new Slot0Configs()
+                    .withKP(kP)
+                    .withKG(kG)
+                    .withGravityType(GravityTypeValue.Elevator_Static));
   }
 
   public static class WristConstants {
@@ -108,7 +106,8 @@ public class Constants {
 
     public static final int motorID = 16;
 
-    public static final double TOLERANCE = 5; // 5 degrees of tolerance to allow contact with hardstops while not being to restrictive
+    public static final double TOLERANCE =
+        5; // 5 degrees of tolerance to allow contact with hardstops while not being to restrictive
   }
 
   public static class VisionConstants {

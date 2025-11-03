@@ -9,28 +9,28 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.frc3512.robot.commands.DriveCommands;
 import org.frc3512.robot.constants.Constants.GeneralConstants;
 import org.frc3512.robot.constants.TunerConstants;
-import org.frc3512.robot.subsytems.arm.Arm;
-import org.frc3512.robot.subsytems.arm.ArmIO;
-import org.frc3512.robot.subsytems.arm.ArmIOSim;
-import org.frc3512.robot.subsytems.arm.ArmIOTalonFX;
-import org.frc3512.robot.subsytems.drive.Drive;
-import org.frc3512.robot.subsytems.drive.GyroIO;
-import org.frc3512.robot.subsytems.drive.GyroIOPigeon2;
-import org.frc3512.robot.subsytems.drive.ModuleIO;
-import org.frc3512.robot.subsytems.drive.ModuleIOSim;
-import org.frc3512.robot.subsytems.drive.ModuleIOTalonFX;
-import org.frc3512.robot.subsytems.elevator.Elevator;
-import org.frc3512.robot.subsytems.elevator.ElevatorIO;
-import org.frc3512.robot.subsytems.elevator.ElevatorIOSim;
-import org.frc3512.robot.subsytems.elevator.ElevatorIOTalonFX;
-import org.frc3512.robot.subsytems.intake.Intake;
-import org.frc3512.robot.subsytems.intake.IntakeIO;
-import org.frc3512.robot.subsytems.intake.IntakeIOSim;
-import org.frc3512.robot.subsytems.intake.IntakeIOTalonFX;
-import org.frc3512.robot.subsytems.wrist.Wrist;
-import org.frc3512.robot.subsytems.wrist.WristIO;
-import org.frc3512.robot.subsytems.wrist.WristIOSim;
-import org.frc3512.robot.subsytems.wrist.WristIOTalonFX;
+import org.frc3512.robot.subsystems.arm.Arm;
+import org.frc3512.robot.subsystems.arm.ArmIO;
+import org.frc3512.robot.subsystems.arm.ArmIOSim;
+import org.frc3512.robot.subsystems.arm.ArmIOTalonFX;
+import org.frc3512.robot.subsystems.drive.Drive;
+import org.frc3512.robot.subsystems.drive.GyroIO;
+import org.frc3512.robot.subsystems.drive.GyroIOPigeon2;
+import org.frc3512.robot.subsystems.drive.ModuleIO;
+import org.frc3512.robot.subsystems.drive.ModuleIOSim;
+import org.frc3512.robot.subsystems.drive.ModuleIOTalonFX;
+import org.frc3512.robot.subsystems.elevator.Elevator;
+import org.frc3512.robot.subsystems.elevator.ElevatorIO;
+import org.frc3512.robot.subsystems.elevator.ElevatorIOSim;
+import org.frc3512.robot.subsystems.elevator.ElevatorIOTalonFX;
+import org.frc3512.robot.subsystems.intake.Intake;
+import org.frc3512.robot.subsystems.intake.IntakeIO;
+import org.frc3512.robot.subsystems.intake.IntakeIOSim;
+import org.frc3512.robot.subsystems.intake.IntakeIOTalonFX;
+import org.frc3512.robot.subsystems.wrist.Wrist;
+import org.frc3512.robot.subsystems.wrist.WristIO;
+import org.frc3512.robot.subsystems.wrist.WristIOSim;
+import org.frc3512.robot.subsystems.wrist.WristIOTalonFX;
 import org.frc3512.robot.superstructure.Superstructure;
 
 @SuppressWarnings("unused")
@@ -122,7 +122,10 @@ public class RobotContainer {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
-            drive, () -> -controller.getLeftX(), () -> -controller.getLeftY(), () -> -controller.getRightX()));
+            drive,
+            () -> -controller.getLeftX(),
+            () -> -controller.getLeftY(),
+            () -> -controller.getRightX()));
   }
 
   private void configureButtonBindings() {
@@ -138,13 +141,8 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Mode Switcher
-    switchToCoral()
-        .onTrue(
-            Commands.runOnce(() -> setMode(driverMode.CORAL)));
-    switchToAlgae()
-        .onTrue(
-            Commands.runOnce(() -> setMode(driverMode.ALGAE)));
-
+    switchToCoral().onTrue(Commands.runOnce(() -> setMode(driverMode.CORAL)));
+    switchToAlgae().onTrue(Commands.runOnce(() -> setMode(driverMode.ALGAE)));
   }
 
   private void configureBindings() {
@@ -229,7 +227,8 @@ public class RobotContainer {
   //   }
   // }
 
-  // // Score method in superstructure will need logic to determoine if we score on mid or l4, because they 
+  // // Score method in superstructure will need logic to determoine if we score on mid or l4,
+  // because they
   // // will have differnt scoring methods due to differnt branch shapes
   // private Trigger score() {
   //   if (currentMode == driverMode.CORAL) {
