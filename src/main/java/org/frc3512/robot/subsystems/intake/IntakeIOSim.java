@@ -1,11 +1,10 @@
 package org.frc3512.robot.subsystems.intake;
 
-import org.frc3512.robot.constants.Constants.IntakeConstants;
-
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import org.frc3512.robot.constants.Constants.IntakeConstants;
 
 public class IntakeIOSim implements IntakeIO {
 
@@ -36,10 +35,8 @@ public class IntakeIOSim implements IntakeIO {
     motorSim.setSupplyVoltage(12);
     motorModel.setInputVoltage(motorSim.getMotorVoltage());
     motorModel.update(0.02);
-    motorSim.setRawRotorPosition(
-        motorModel.getAngularPosition().times(IntakeConstants.GEAR_RATIO));
-    motorSim.setRotorVelocity(
-        motorModel.getAngularVelocity().times(IntakeConstants.GEAR_RATIO));
+    motorSim.setRawRotorPosition(motorModel.getAngularPosition().times(IntakeConstants.GEAR_RATIO));
+    motorSim.setRotorVelocity(motorModel.getAngularVelocity().times(IntakeConstants.GEAR_RATIO));
 
     // Update inputs
     inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();

@@ -1,11 +1,9 @@
 package org.frc3512.robot.subsystems.wrist;
 
-import org.frc3512.robot.constants.Constants.WristConstants;
-
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.math.MathUtil;
+import org.frc3512.robot.constants.Constants.WristConstants;
 
 public class WristIOTalonFX implements WristIO {
 

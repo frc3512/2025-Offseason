@@ -9,7 +9,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.reduxrobotics.sensors.canandcolor.CanandcolorSettings;
 import com.reduxrobotics.sensors.canandcolor.ProximityPeriod;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -61,17 +60,10 @@ public class Constants {
         new TalonFXConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs()
-                  .withInverted(InvertedValue.Clockwise_Positive)
-                  .withNeutralMode(NeutralModeValue.Brake))
-            .withFeedback(
-                new FeedbackConfigs()
-                  .withSensorToMechanismRatio(GEAR_RATIO))
-            .withSlot0(
-                new Slot0Configs()
-                  .withKP(kP)
-                  .withKI(kI)
-                  .withKD(kD)
-                  .withKA(kA));
+                    .withInverted(InvertedValue.Clockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Brake))
+            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO))
+            .withSlot0(new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKA(kA));
   }
 
   public static class ElevatorConstants {
@@ -99,9 +91,7 @@ public class Constants {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.Clockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
-            .withFeedback(
-                new FeedbackConfigs()
-                    .withSensorToMechanismRatio(GEAR_RATIO))
+            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO))
             .withSlot0(
                 new Slot0Configs()
                     .withKP(kP)
@@ -124,17 +114,14 @@ public class Constants {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.Clockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
-            .withFeedback(
-                new FeedbackConfigs()
-                    .withSensorToMechanismRatio(GEAR_RATIO));
+            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO));
 
-    public static final CanandcolorSettings sensorConfig = 
+    public static final CanandcolorSettings sensorConfig =
         new CanandcolorSettings()
             .setColorFramePeriod(0.040)
             .setLampLEDBrightness(0.35) // 35% brightness
             .setAlignColorFramesToIntegrationPeriod(true)
             .setProximityIntegrationPeriod(ProximityPeriod.k20ms);
-
   }
 
   public static class WristConstants {
@@ -157,12 +144,8 @@ public class Constants {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.CounterClockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
-            .withFeedback(
-                new FeedbackConfigs()
-                    .withSensorToMechanismRatio(GEAR_RATIO))
-            .withSlot0(
-                new Slot0Configs()
-                    .withKP(kP));
+            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO))
+            .withSlot0(new Slot0Configs().withKP(kP));
   }
 
   public static class VisionConstants {

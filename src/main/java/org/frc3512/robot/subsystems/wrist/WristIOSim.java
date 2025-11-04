@@ -1,12 +1,11 @@
 package org.frc3512.robot.subsystems.wrist;
 
-import org.frc3512.robot.constants.Constants.WristConstants;
-
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import org.frc3512.robot.constants.Constants.WristConstants;
 
 public class WristIOSim implements WristIO {
 
@@ -15,7 +14,8 @@ public class WristIOSim implements WristIO {
 
   private DCMotorSim motorModel =
       new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(WristConstants.simMotor, 0.001, WristConstants.GEAR_RATIO),
+          LinearSystemId.createDCMotorSystem(
+              WristConstants.simMotor, 0.001, WristConstants.GEAR_RATIO),
           WristConstants.simMotor);
 
   public WristIOSim() {

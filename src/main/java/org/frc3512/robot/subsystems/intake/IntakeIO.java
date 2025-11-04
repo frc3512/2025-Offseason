@@ -34,10 +34,19 @@ public interface IntakeIO {
     return false;
   }
 
-  public default double getRed() {return 0.0;}
-  public default double getGreen() {return 0.0;}
-  public default double getBlue() {return 0.0;}
+  public default double getRed() {
+    return 0.0;
+  }
 
-  public default double getObjectDistance() {return 0.0;}
+  public default double getGreen() {
+    return 0.0;
+  }
 
+  public default double getBlue() {
+    return 0.0;
+  }
+
+  public default double getObjectDistance() {
+    return 0.0;
+  }
 }

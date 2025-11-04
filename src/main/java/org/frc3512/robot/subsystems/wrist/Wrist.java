@@ -21,8 +21,7 @@ public class Wrist extends SubsystemBase {
 
   @AutoLogOutput(key = "Mechanism States/Wrist At Setpoint")
   public boolean atSetpoint() {
-    return Math.abs(inputs.positionSetpoint - inputs.motorPosition) 
-      < WristConstants.TOLERANCE;
+    return Math.abs(inputs.positionSetpoint - inputs.motorPosition) < WristConstants.TOLERANCE;
   }
 
   @Override

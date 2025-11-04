@@ -1,10 +1,9 @@
 package org.frc3512.robot.subsystems.intake;
 
-import org.frc3512.robot.constants.Constants.IntakeConstants;
-
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.reduxrobotics.sensors.canandcolor.Canandcolor;
+import org.frc3512.robot.constants.Constants.IntakeConstants;
 
 public class IntakeIOTalonFX implements IntakeIO {
 
@@ -21,7 +20,6 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     motor.getConfigurator().apply(IntakeConstants.config);
     sensor.setSettings(IntakeConstants.sensorConfig);
-
   }
 
   @Override
@@ -39,5 +37,4 @@ public class IntakeIOTalonFX implements IntakeIO {
   public void changeSetpoint(IntakeStates newSetpoint) {
     setpoint.Output = newSetpoint.speed; // Set desired voltage
   }
-
 }
