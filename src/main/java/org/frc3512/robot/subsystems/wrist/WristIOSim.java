@@ -1,46 +1,58 @@
 package org.frc3512.robot.subsystems.wrist;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
+import org.frc3512.robot.constants.Constants.WristConstants;
+
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import org.frc3512.robot.constants.Constants.WristConstants;
 
 public class WristIOSim implements WristIO {
 
-  DCMotorSim motorSim =
-      new DCMotorSim(
-          LinearSystemId.createDCMotorSystem(
-              DCMotor.getKrakenX60(1), 0.025, WristConstants.GEAR_RATIO),
-          DCMotor.getKrakenX60(1));
-  PIDController simController = new PIDController(WristConstants.kP, 0, 0);
+  private TalonFX motor;
+  private MotionMagicVoltage setpoint = new MotionMagicVoltage(0); // Mechanism Rotations
 
-  WristStates targetPosition = WristStates.STOW;
+  private DCMotorSim motorModel =
+      new DCMotorSim(
+          LinearSystemId.createDCMotorSystem(WristConstants.simMotor, 0.001, WristConstants.GEAR_RATIO),
+          WristConstants.simMotor);
+
+  public WristIOSim() {
+
+    // Motor Initialization
+    motor = new TalonFX(WristConstants.ID);
+    motor.getConfigurator().apply(WristConstants.config);
+  }
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
-    inputs.wristAngle = motorSim.getAngularPositionRotations() * 360;
-    inputs.appliedVolts = motorSim.getInputVoltage();
-    inputs.supplyCurrent = motorSim.getCurrentDrawAmps();
+
+    // Apply setpoints
+    motor.setControl(setpoint);
+
+    // Simulate motor
+    var motorSim = motor.getSimState();
+    motorSim.setSupplyVoltage(12);
+    motorModel.setInputVoltage(motorSim.getMotorVoltage());
+    motorModel.update(0.02);
+    motorSim.setRawRotorPosition(motorModel.getAngularPosition().times(WristConstants.GEAR_RATIO));
+    motorSim.setRotorVelocity(motorModel.getAngularVelocity().times(WristConstants.GEAR_RATIO));
+
+    // Update inputs
+    inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
+    inputs.motorCurrent = motor.getSupplyCurrent().getValueAsDouble();
+    inputs.motorPosition =
+        motor.getPosition().getValueAsDouble() * 360; // Convert rotations to degrees
+    inputs.motorVelocity = motor.getVelocity().getValueAsDouble() * 360; // Convert rps to dps
+    inputs.motorAcceleration =
+        motor.getAcceleration().getValueAsDouble() * 360; // Convert rps^2 to dps^2
+    inputs.positionSetpoint = setpoint.Position * 360; // Convert rotations to degrees
   }
 
   @Override
-  public void updateSim() {
-    motorSim.setInputVoltage(
-        simController.calculate(
-            motorSim.getAngularPositionRotations() * 360, targetPosition.position / 360.0));
-    motorSim.update(0.02);
-  }
-
-  public double getPosition() {
-    return motorSim.getAngularPositionRotations();
-  }
-
-  public double getVelocityMetersPerSec() {
-    return motorSim.getAngularVelocityRPM() / 60 * 2 * Math.PI;
-  }
-
-  public boolean atSetpoint() {
-    return Math.abs(motorSim.getAngularPositionRotations() - targetPosition.position / 360.0) < 0.1;
+  public void changeSetpoint(WristStates newSetpoint) {
+    var degrees = MathUtil.clamp(newSetpoint.degrees, -120, 120);
+    setpoint.Position = degrees / 360.0; // Convert degrees to rotations
   }
 }

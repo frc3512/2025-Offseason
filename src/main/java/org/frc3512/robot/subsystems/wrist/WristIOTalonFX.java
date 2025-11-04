@@ -1,87 +1,58 @@
 package org.frc3512.robot.subsystems.wrist;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import org.frc3512.robot.constants.Constants.WristConstants;
+
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
-import org.frc3512.robot.constants.Constants.WristConstants;
+
+import edu.wpi.first.math.MathUtil;
 
 public class WristIOTalonFX implements WristIO {
 
   private TalonFX motor;
 
-  PositionVoltage positionRequest = new PositionVoltage(WristStates.STOW.position);
-
-  private final StatusSignal<Angle> position;
-  private final StatusSignal<Voltage> voltage;
-  private final StatusSignal<Current> supplyCurrent;
-  private final StatusSignal<Current> statorCurrent;
-  private final StatusSignal<Temperature> temperature;
-  private final StatusSignal<AngularVelocity> angularVelocity;
-  private final StatusSignal<AngularAcceleration> angularAcceleration;
+  PositionVoltage setpoint = new PositionVoltage(WristStates.STOW.degrees);
 
   public WristIOTalonFX() {
 
-    motor = new TalonFX(16);
+    motor = new TalonFX(15);
 
-    TalonFXConfiguration config = new TalonFXConfiguration();
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.CurrentLimits.SupplyCurrentLimit = 20.0;
-    config.CurrentLimits.StatorCurrentLimit = 20.0;
+    motor.getConfigurator().apply(WristConstants.config);
 
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    var motorVoltageSignal = motor.getMotorVoltage();
+    var motorCurrentSignal = motor.getSupplyCurrent();
+    var motorPositionSignal = motor.getPosition();
+    var motorVelocitySignal = motor.getVelocity();
+    var motorAccelerationSignal = motor.getAcceleration();
 
-    config.Feedback.SensorToMechanismRatio = WristConstants.GEAR_RATIO;
+    motorVoltageSignal.setUpdateFrequency(50);
+    motorCurrentSignal.setUpdateFrequency(50);
+    motorPositionSignal.setUpdateFrequency(50);
+    motorVelocitySignal.setUpdateFrequency(50);
+    motorAccelerationSignal.setUpdateFrequency(50);
 
-    config.Slot0.withKP(WristConstants.kP);
-
-    position = motor.getPosition();
-    voltage = motor.getMotorVoltage();
-    supplyCurrent = motor.getSupplyCurrent();
-    statorCurrent = motor.getStatorCurrent();
-    temperature = motor.getDeviceTemp();
-    angularVelocity = motor.getRotorVelocity();
-    angularAcceleration = motor.getAcceleration();
-
-    motor.setPosition(0.000000);
+    motor.setPosition(0.00000000);
   }
 
   @Override
   public void updateInputs(WristIOInputs inputs) {
 
-    inputs.wristAngle = position.getValueAsDouble() * 360;
+    motor.setControl(setpoint);
 
-    inputs.appliedVolts = voltage.getValueAsDouble();
-    inputs.supplyCurrent = supplyCurrent.getValueAsDouble();
-    inputs.statorCurrent = statorCurrent.getValueAsDouble();
-    inputs.motorTemp = temperature.getValueAsDouble();
+    // Update inputs
+    inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
+    inputs.motorCurrent = motor.getSupplyCurrent().getValueAsDouble();
+    inputs.motorPosition =
+        motor.getPosition().getValueAsDouble() * 360; // Convert rotations to degrees
+    inputs.motorVelocity = motor.getVelocity().getValueAsDouble() * 360; // Convert rps to dps
+    inputs.motorAcceleration =
+        motor.getAcceleration().getValueAsDouble() * 360; // Convert rps^2 to dps^2
+    inputs.positionSetpoint = setpoint.Position * 360; // Convert rotations to degrees
   }
 
   @Override
-  public void setDesiredState(WristStates target) {
-    motor.setControl(positionRequest.withPosition(target.position / 360.0));
-  }
-
-  @Override
-  public void refreshData() {
-    BaseStatusSignal.refreshAll(
-        position,
-        voltage,
-        supplyCurrent,
-        statorCurrent,
-        temperature,
-        angularVelocity,
-        angularAcceleration);
+  public void changeSetpoint(WristStates newSetpoint) {
+    var degrees = MathUtil.clamp(newSetpoint.degrees, -5, 95);
+    setpoint.Position = degrees / 360.0; // Convert degrees to rotations
   }
 }

@@ -58,10 +58,17 @@ public class Constants {
         new TalonFXConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs()
-                    .withInverted(InvertedValue.Clockwise_Positive)
-                    .withNeutralMode(NeutralModeValue.Brake))
-            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO))
-            .withSlot0(new Slot0Configs().withKP(kP).withKI(kI).withKD(kD).withKA(kA));
+                  .withInverted(InvertedValue.Clockwise_Positive)
+                  .withNeutralMode(NeutralModeValue.Brake))
+            .withFeedback(
+                new FeedbackConfigs()
+                  .withSensorToMechanismRatio(GEAR_RATIO))
+            .withSlot0(
+                new Slot0Configs()
+                  .withKP(kP)
+                  .withKI(kI)
+                  .withKD(kD)
+                  .withKA(kA));
   }
 
   public static class ElevatorConstants {
@@ -89,7 +96,9 @@ public class Constants {
                 new MotorOutputConfigs()
                     .withInverted(InvertedValue.Clockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Brake))
-            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(GEAR_RATIO))
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withSensorToMechanismRatio(GEAR_RATIO))
             .withSlot0(
                 new Slot0Configs()
                     .withKP(kP)
@@ -104,10 +113,25 @@ public class Constants {
 
     public static final double GEAR_RATIO = 10.178;
 
-    public static final int motorID = 16;
+    public static final int ID = 16;
+
+    public static final DCMotor simMotor = DCMotor.getFalcon500(1);
 
     public static final double TOLERANCE =
         5; // 5 degrees of tolerance to allow contact with hardstops while not being to restrictive
+
+    public static final TalonFXConfiguration config =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.CounterClockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Brake))
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withSensorToMechanismRatio(GEAR_RATIO))
+            .withSlot0(
+                new Slot0Configs()
+                    .withKP(kP));
   }
 
   public static class VisionConstants {

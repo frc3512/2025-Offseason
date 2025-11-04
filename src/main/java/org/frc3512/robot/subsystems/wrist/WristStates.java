@@ -16,11 +16,11 @@ public enum WristStates {
   // DIAGONAL
   PROCESS(45, "Processing");
 
-  public double position;
+  public double degrees;
   public String state;
 
-  WristStates(double totalPosition, String state) {
-    this.position = totalPosition;
+  WristStates(double degrees, String state) {
+    this.degrees = degrees;
     this.state = state;
   }
 }

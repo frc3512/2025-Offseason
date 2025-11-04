@@ -1,29 +1,21 @@
 package org.frc3512.robot.subsystems.wrist;
 
-import org.frc3512.robot.util.SubsystemDataProcessor;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface WristIO extends SubsystemDataProcessor.IODataRefresher {
+public interface WristIO {
 
   @AutoLog
-  class WristIOInputs {
+  public class WristIOInputs {
 
-    public double wristAngle;
-
-    public double appliedVolts;
-    public double supplyCurrent;
-    public double statorCurrent;
-    public double motorTemp;
-
-    public int state;
+    public double motorVoltage = 0.0; // Volts
+    public double motorCurrent = 0.0; // Amps
+    public double motorPosition = 0.0; // Degrees
+    public double motorVelocity = 0.0; // Degrees per Second
+    public double motorAcceleration = 0.0; // Degrees per Second Squared
+    public double positionSetpoint = 0.0; // Degrees
   }
 
-  default void setDesiredState(WristStates target) {}
+  public default void updateInputs(WristIOInputs inputs) {}
 
-  default void updateInputs(WristIOInputs inputs) {}
-
-  default void updateSim() {}
-
-  @Override
-  default void refreshData() {}
+  public default void changeSetpoint(WristStates newSetpoint) {}
 }
