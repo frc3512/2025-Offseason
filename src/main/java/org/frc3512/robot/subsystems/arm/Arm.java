@@ -19,7 +19,7 @@ public class Arm extends SubsystemBase {
     return runOnce(() -> io.changeSetpoint(newSetpoint));
   }
 
-  @AutoLogOutput(key = "MechanismStates/RotaryAtSetpoint")
+  @AutoLogOutput(key = "Mechanism States/Arm At Setpoint")
   public boolean atSetpoint() {
     return Math.abs(inputs.positionSetpoint - inputs.motorPosition) < ArmConstants.TOLERANCE;
   }
@@ -27,6 +27,6 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Rotary/", inputs);
+    Logger.processInputs("Arm/", inputs);
   }
 }

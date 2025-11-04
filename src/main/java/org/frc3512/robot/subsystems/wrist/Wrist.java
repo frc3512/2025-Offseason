@@ -19,7 +19,7 @@ public class Wrist extends SubsystemBase {
     return runOnce(() -> io.changeSetpoint(newSetpoint));
   }
 
-  @AutoLogOutput(key = "MechanismStates/RotaryAtSetpoint")
+  @AutoLogOutput(key = "Mechanism States/Wrist At Setpoint")
   public boolean atSetpoint() {
     return Math.abs(inputs.positionSetpoint - inputs.motorPosition) 
       < WristConstants.TOLERANCE;
@@ -28,6 +28,6 @@ public class Wrist extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Rotary/", inputs);
+    Logger.processInputs("Wrist/", inputs);
   }
 }

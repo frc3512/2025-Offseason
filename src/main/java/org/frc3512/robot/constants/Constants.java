@@ -7,6 +7,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.reduxrobotics.sensors.canandcolor.CanandcolorSettings;
+import com.reduxrobotics.sensors.canandcolor.ProximityPeriod;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -104,6 +107,34 @@ public class Constants {
                     .withKP(kP)
                     .withKG(kG)
                     .withGravityType(GravityTypeValue.Elevator_Static));
+  }
+
+  public static class IntakeConstants {
+
+    public static final int motorID = 17;
+    public static final int sensorID = 31;
+
+    public static final double GEAR_RATIO = 1.0;
+
+    public static final DCMotor simMotor = DCMotor.getFalcon500(1);
+
+    public static final TalonFXConfiguration config =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.Clockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Brake))
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withSensorToMechanismRatio(GEAR_RATIO));
+
+    public static final CanandcolorSettings sensorConfig = 
+        new CanandcolorSettings()
+            .setColorFramePeriod(0.040)
+            .setLampLEDBrightness(0.35) // 35% brightness
+            .setAlignColorFramesToIntegrationPeriod(true)
+            .setProximityIntegrationPeriod(ProximityPeriod.k20ms);
+
   }
 
   public static class WristConstants {

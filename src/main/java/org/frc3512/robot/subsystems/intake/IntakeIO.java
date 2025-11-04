@@ -22,21 +22,22 @@ public interface IntakeIO {
     double blue = 0.0;
   }
 
-  default void setIntakeSpeed(double speed) {}
+  public default void updateInputs(IntakeIOInputs inputs) {}
 
-  default void updateInputs(IntakeIOInputs inputs) {}
+  public default void changeSetpoint(IntakeStates newSetpoint) {}
 
-  default boolean hasCoral() {
+  public default boolean hasCoral() {
     return false;
   }
 
-  default boolean hasAlgae() {
+  public default boolean hasAlgae() {
     return false;
   }
 
-  default boolean isIntaking() {
-    return false;
-  }
+  public default double getRed() {return 0.0;}
+  public default double getGreen() {return 0.0;}
+  public default double getBlue() {return 0.0;}
 
-  default void setDesiredState(IntakeStates target) {}
+  public default double getObjectDistance() {return 0.0;}
+
 }
