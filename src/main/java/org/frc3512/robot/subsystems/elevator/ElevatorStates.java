@@ -12,13 +12,13 @@ public enum ElevatorStates {
   // | Reef
   L4(46, "L4"),
   L3(18, "L3"),
-  L2(0, "L2"),
+  L2(3, "L2"),
 
   TROUGH(7, "Trough"),
 
   // | Intake
   INTAKE(11, "Intaking Coral"),
-  PREP_CORAL(3, "Preping Coral"),
+  PREP_CORAL(5, "Preping Coral"),
 
   // * Algae
 

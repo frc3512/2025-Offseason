@@ -14,6 +14,7 @@ public interface IntakeIO {
     double currentAmps = 0.0;
     boolean hasCoral = false;
     boolean hasAlgae = false;
+    boolean isStalled = false;
     boolean isIntaking = false;
     double temperature = 0;
 
@@ -31,6 +32,10 @@ public interface IntakeIO {
   }
 
   public default boolean hasAlgae() {
+    return false;
+  }
+
+  public default boolean isStalled() {
     return false;
   }
 

@@ -30,5 +30,4 @@ public class Intake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Intake/", inputs);
   }
-
 }

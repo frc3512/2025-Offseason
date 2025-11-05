@@ -45,12 +45,7 @@ public class RobotContainer {
 
   private Drive drive;
 
-  private Superstructure actions = 
-    new Superstructure(
-      arm, 
-      elevator, 
-      wrist, 
-      intake);
+  private Superstructure actions = new Superstructure(arm, elevator, wrist, intake);
 
   // * Create Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -141,6 +136,15 @@ public class RobotContainer {
     // Mode Switcher
     switchToCoral().onTrue(Commands.runOnce(() -> actions.setMode(driverMode.CORAL)));
     switchToAlgae().onTrue(Commands.runOnce(() -> actions.setMode(driverMode.ALGAE)));
+
+    // | Intake
+    controller
+        .leftBumper()
+        .onTrue(
+            Commands.runOnce(() -> actions.doIntakeLogic())
+                .until(() -> intake.hasCoral() || intake.hasAlgae())
+                .andThen(() -> Commands.runOnce(() -> actions.doPrepLogic())))
+        .onFalse(Commands.runOnce(() -> actions.doPrepLogic()));
   }
 
   private void configureBindings() {

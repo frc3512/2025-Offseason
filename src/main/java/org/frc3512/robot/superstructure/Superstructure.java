@@ -58,31 +58,60 @@ public class Superstructure {
 
   // * Resst superstructure to stowed position
   public Command stow() {
-    return Commands.parallel(
-      arm.changeSetpoint(ArmStates.STOW),
-      elevator.changeSetpoint(ElevatorStates.STOW),
-      wrist.changeSetpoint(WristStates.STOW),
-      
-      intake.changeSetpoint(IntakeStates.STOPPED));
+    return Commands.sequence(
+        Commands.runOnce(
+            () ->
+                setState(
+                    ArmStates.STOW, ElevatorStates.STOW, WristStates.STOW, IntakeStates.STOPPED)),
+        Commands.runOnce(() -> coralReady = false),
+        Commands.runOnce(() -> bargeReady = false),
+        Commands.runOnce(() -> processorReady = false));
   }
 
   // * --- CORAL ---
+
+  // | Intake
+  public Command intakeCoral() {
+    if (!intake.hasCoral()) {
+      return Commands.sequence(
+          Commands.runOnce(
+              () ->
+                  setState(
+                      ArmStates.INTAKE_CORAL,
+                      ElevatorStates.INTAKE,
+                      WristStates.INTAKE,
+                      IntakeStates.INTAKE)));
+
+    } else {
+      return stow();
+    }
+  }
+
+  public Command prepCoral() {
+    if (intake.hasCoral()) {
+      return Commands.sequence(
+          Commands.runOnce(
+              () ->
+                  setState(
+                      ArmStates.STOW,
+                      ElevatorStates.PREP_CORAL,
+                      WristStates.CORAL,
+                      IntakeStates.STOPPED)));
+    } else {
+      return stow();
+    }
+  }
 
   // | l1
   public Command prepTrough() {
     if (intake.hasCoral()) {
       return Commands.sequence(
-
-      Commands.parallel(
-        arm.changeSetpoint(ArmStates.TROUGH),
-        elevator.changeSetpoint(ElevatorStates.TROUGH),
-        wrist.changeSetpoint(WristStates.TROUGH),
-        
-        intake.changeSetpoint(IntakeStates.STOPPED)),
-
-      Commands.runOnce(() -> coralReady = true)
-
-    );
+          Commands.parallel(
+              arm.changeSetpoint(ArmStates.TROUGH),
+              elevator.changeSetpoint(ElevatorStates.TROUGH),
+              wrist.changeSetpoint(WristStates.TROUGH),
+              intake.changeSetpoint(IntakeStates.STOPPED)),
+          Commands.runOnce(() -> coralReady = true));
 
     } else {
       return stow();
@@ -92,34 +121,65 @@ public class Superstructure {
   public Command placeTrough() {
     if (coralReady) {
       return Commands.sequence(
-        Commands.parallel(
-          arm.changeSetpoint(ArmStates.TROUGH),
-          elevator.changeSetpoint(ElevatorStates.TROUGH),
-          wrist.changeSetpoint(WristStates.TROUGH),
-          
-          intake.changeSetpoint(IntakeStates.SPIT)),
-
-        Commands.waitSeconds(0.5),
-
-        stow(),
-
-        Commands.runOnce(() -> coralReady = false)
-      );
+          Commands.parallel(
+              arm.changeSetpoint(ArmStates.TROUGH),
+              elevator.changeSetpoint(ElevatorStates.TROUGH),
+              wrist.changeSetpoint(WristStates.TROUGH),
+              intake.changeSetpoint(IntakeStates.SPIT)),
+          Commands.waitSeconds(0.5),
+          stow(),
+          Commands.runOnce(() -> coralReady = false));
     } else {
       return stow();
     }
   }
 
   // | L2 / 3
-  public Command prepMid() {
+  public Command prepMid(ElevatorStates level) {
     if (intake.hasCoral()) {
       return Commands.sequence(
+          Commands.parallel(
+              elevator.changeSetpoint(level),
+              arm.changeSetpoint(ArmStates.PREP_MID),
+              wrist.changeSetpoint(WristStates.CORAL),
+              intake.changeSetpoint(IntakeStates.STOPPED)),
+          Commands.runOnce(() -> coralReady = true));
 
-
-      );
     } else {
       return stow();
     }
   }
 
+  // * --- Double Binding logic
+  public Command doIntakeLogic() {
+    if (currentMode == driverMode.CORAL) {
+      return intakeCoral();
+    } else {
+      // intakeAlgae();
+      return null;
+    }
+  }
+
+  public Command doPrepLogic() {
+    if (currentMode == driverMode.CORAL) {
+      return prepCoral();
+    } else {
+      // return prepAlgae();
+      return null;
+    }
+  }
+
+  // * --- Full system updates
+  public Command setState(
+      ArmStates armState,
+      ElevatorStates elevatorState,
+      WristStates wristState,
+      IntakeStates intakeState) {
+
+    return Commands.parallel(
+        arm.changeSetpoint(armState),
+        elevator.changeSetpoint(elevatorState),
+        wrist.changeSetpoint(wristState),
+        intake.changeSetpoint(intakeState));
+  }
 }
