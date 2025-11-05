@@ -5,6 +5,8 @@ public enum IntakeStates {
 
   EJECT(0.9),
 
+  SPIT(0.4),
+
   PLACE(0.15),
 
   HOLD(0.25),

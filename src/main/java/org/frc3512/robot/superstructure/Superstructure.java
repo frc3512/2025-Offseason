@@ -21,6 +21,19 @@ public class Superstructure {
 
   Intake intake;
 
+  Boolean coralReady = false;
+  Boolean bargeReady = false;
+  Boolean processorReady = false;
+
+  // * Create Mode Selector for single driver
+  public enum driverMode {
+    CORAL,
+    ALGAE
+  }
+
+  public driverMode currentMode;
+
+  // All subsystems have a reset to stow if we do not meet conditions for action
   public Superstructure(Arm arm, Elevator elevator, Wrist wrist, Intake intake) {
 
     // stateMachine = new StateMachine();
@@ -32,6 +45,18 @@ public class Superstructure {
     this.intake = intake;
   }
 
+  public void setMode(driverMode mode) {
+    switch (mode) {
+      case CORAL:
+        currentMode = driverMode.CORAL;
+        break;
+      case ALGAE:
+        currentMode = driverMode.ALGAE;
+        break;
+    }
+  }
+
+  // * Resst superstructure to stowed position
   public Command stow() {
     return Commands.parallel(
       arm.changeSetpoint(ArmStates.STOW),
@@ -40,4 +65,61 @@ public class Superstructure {
       
       intake.changeSetpoint(IntakeStates.STOPPED));
   }
+
+  // * --- CORAL ---
+
+  // | l1
+  public Command prepTrough() {
+    if (intake.hasCoral()) {
+      return Commands.sequence(
+
+      Commands.parallel(
+        arm.changeSetpoint(ArmStates.TROUGH),
+        elevator.changeSetpoint(ElevatorStates.TROUGH),
+        wrist.changeSetpoint(WristStates.TROUGH),
+        
+        intake.changeSetpoint(IntakeStates.STOPPED)),
+
+      Commands.runOnce(() -> coralReady = true)
+
+    );
+
+    } else {
+      return stow();
+    }
+  }
+
+  public Command placeTrough() {
+    if (coralReady) {
+      return Commands.sequence(
+        Commands.parallel(
+          arm.changeSetpoint(ArmStates.TROUGH),
+          elevator.changeSetpoint(ElevatorStates.TROUGH),
+          wrist.changeSetpoint(WristStates.TROUGH),
+          
+          intake.changeSetpoint(IntakeStates.SPIT)),
+
+        Commands.waitSeconds(0.5),
+
+        stow(),
+
+        Commands.runOnce(() -> coralReady = false)
+      );
+    } else {
+      return stow();
+    }
+  }
+
+  // | L2 / 3
+  public Command prepMid() {
+    if (intake.hasCoral()) {
+      return Commands.sequence(
+
+
+      );
+    } else {
+      return stow();
+    }
+  }
+
 }

@@ -17,9 +17,18 @@ public class Intake extends SubsystemBase {
     return runOnce(() -> io.changeSetpoint(setpoint));
   }
 
+  public Boolean hasCoral() {
+    return io.hasCoral();
+  }
+
+  public Boolean hasAlgae() {
+    return io.hasAlgae();
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Intake/", inputs);
   }
+
 }

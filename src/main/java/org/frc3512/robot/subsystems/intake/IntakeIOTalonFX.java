@@ -37,4 +37,22 @@ public class IntakeIOTalonFX implements IntakeIO {
   public void changeSetpoint(IntakeStates newSetpoint) {
     setpoint.Output = newSetpoint.speed; // Set desired voltage
   }
+
+  @Override
+  public boolean hasCoral() {
+    if (getObjectDistance() <= 0.04) {
+        if (getRed() >= 0 && getRed() <= 0.06 &&
+            getGreen() >= 0 && getGreen() <= 0.06 && 
+            getBlue() >= 0 && getBlue() <= 0.06) {
+                
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;            
+    }
+  }
+
+
 }

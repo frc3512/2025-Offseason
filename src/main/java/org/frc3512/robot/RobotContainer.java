@@ -32,6 +32,7 @@ import org.frc3512.robot.subsystems.wrist.WristIO;
 import org.frc3512.robot.subsystems.wrist.WristIOSim;
 import org.frc3512.robot.subsystems.wrist.WristIOTalonFX;
 import org.frc3512.robot.superstructure.Superstructure;
+import org.frc3512.robot.superstructure.Superstructure.driverMode;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -44,7 +45,7 @@ public class RobotContainer {
 
   private Drive drive;
 
-  private Superstructure superstructure = 
+  private Superstructure actions = 
     new Superstructure(
       arm, 
       elevator, 
@@ -55,14 +56,6 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // ? Create Vision
-
-  // * Create Mode Selector for single driver
-  private enum driverMode {
-    CORAL,
-    ALGAE
-  }
-
-  private driverMode currentMode;
 
   public RobotContainer() {
 
@@ -146,24 +139,13 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Mode Switcher
-    switchToCoral().onTrue(Commands.runOnce(() -> setMode(driverMode.CORAL)));
-    switchToAlgae().onTrue(Commands.runOnce(() -> setMode(driverMode.ALGAE)));
+    switchToCoral().onTrue(Commands.runOnce(() -> actions.setMode(driverMode.CORAL)));
+    switchToAlgae().onTrue(Commands.runOnce(() -> actions.setMode(driverMode.ALGAE)));
   }
 
   private void configureBindings() {
     configureAxisActions();
     configureButtonBindings();
-  }
-
-  private void setMode(driverMode mode) {
-    switch (mode) {
-      case CORAL:
-        currentMode = driverMode.CORAL;
-        break;
-      case ALGAE:
-        currentMode = driverMode.ALGAE;
-        break;
-    }
   }
 
   public Command getAutonomousCommand() {
@@ -190,122 +172,4 @@ public class RobotContainer {
   private Trigger switchToAlgae() {
     return controller.back();
   }
-
-  // //  --- CORAL ---
-  // private Trigger intakeCoral() {
-  //   if (currentMode == driverMode.CORAL) {
-  //     return controller.leftTrigger();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger l1() {
-  //   if (currentMode == driverMode.CORAL) {
-  //     return controller.b();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger l2() {
-  //   if (currentMode == driverMode.CORAL) {
-  //     return controller.a();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger l3() {
-  //   if (currentMode == driverMode.CORAL) {
-  //     return controller.x();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger l4() {
-  //   if (currentMode == driverMode.CORAL) {
-  //     return controller.y();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // // Score method in superstructure will need logic to determoine if we score on mid or l4,
-  // because they
-  // // will have differnt scoring methods due to differnt branch shapes
-  // private Trigger score() {
-  //   if (currentMode == driverMode.CORAL) {
-  //     return controller.rightTrigger();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // // --- ALGAE ---
-  // private Trigger intakeAlgae() {
-  //   if (currentMode == driverMode.ALGAE) {
-  //     return controller.leftTrigger();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger deReefA1() {
-  //   if (currentMode == driverMode.ALGAE) {
-  //     return controller.a();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger deReefA2() {
-  //   if (currentMode == driverMode.ALGAE) {
-  //     return controller.y();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger process() {
-  //   if (currentMode == driverMode.ALGAE) {
-  //     return controller.b();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger barge() {
-  //   if (currentMode == driverMode.ALGAE) {
-  //     return controller.x();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // // Vision - Implement after IO if fully working
-  // private Trigger allignLeft() {
-  //   if (currentMode == driverMode.CORAL) {
-  //     return controller.leftBumper();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger allignRight() {
-  //   if (currentMode == driverMode.CORAL) {
-  //     return controller.rightBumper();
-  //   } else {
-  //     return null;
-  //   }
-  // }
-
-  // private Trigger allignAlgae() {
-  //   if (currentMode == driverMode.ALGAE) {
-  //     return controller.leftBumper();
-  //   } else {
-  //     return null;
-  //   }
-  // }
 }
