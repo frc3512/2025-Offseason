@@ -32,16 +32,26 @@ public class IntakeIOTalonFX implements IntakeIO {
     motor.setControl(setpoint);
 
     // Update inputs
-    inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
-    inputs.currentAmps = motor.getSupplyCurrent().getValueAsDouble();
+    inputs.objectDistance = getObjectDistance();
+    inputs.temperature = motor.getDeviceTemp().getValueAsDouble();
+
     inputs.hasAlgae = hasAlgae();
     inputs.hasCoral = hasCoral();
     inputs.isStalled = isStalled();
+
+    inputs.red = sensor.getRed();
+    inputs.green = sensor.getGreen();
+    inputs.blue = sensor.getBlue();
   }
 
   @Override
   public void changeSetpoint(IntakeStates newSetpoint) {
     setpoint.Output = newSetpoint.speed; // Set desired voltage
+  }
+
+  @Override
+  public double getObjectDistance() {
+    return sensor.getProximity();
   }
 
   @Override
@@ -92,5 +102,20 @@ public class IntakeIOTalonFX implements IntakeIO {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public double getRed() {
+    return sensor.getRed();
+  }
+
+  @Override
+  public double getGreen() {
+    return sensor.getGreen();
+  }
+
+  @Override
+  public double getBlue() {
+    return sensor.getBlue();
   }
 }

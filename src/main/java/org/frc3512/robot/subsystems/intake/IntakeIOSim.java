@@ -37,10 +37,6 @@ public class IntakeIOSim implements IntakeIO {
     motorModel.update(0.02);
     motorSim.setRawRotorPosition(motorModel.getAngularPosition().times(IntakeConstants.GEAR_RATIO));
     motorSim.setRotorVelocity(motorModel.getAngularVelocity().times(IntakeConstants.GEAR_RATIO));
-
-    // Update inputs
-    inputs.appliedVolts = motor.getMotorVoltage().getValueAsDouble();
-    inputs.currentAmps = motor.getSupplyCurrent().getValueAsDouble();
   }
 
   @Override

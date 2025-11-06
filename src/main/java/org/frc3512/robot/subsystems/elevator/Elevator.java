@@ -19,7 +19,7 @@ public class Elevator extends SubsystemBase {
     return runOnce(() -> io.changeSetpoint(newSetpoint));
   }
 
-  @AutoLogOutput(key = "MechanismStates/ElevatorAtSetpoint")
+  @AutoLogOutput(key = "Mechanism States/ElevatorAtSetpoint")
   public boolean atSetpoint() {
     return Math.abs(inputs.positionSetpoint - inputs.motorPosition)
         < ElevatorConstants.heightTolerance;
@@ -28,6 +28,6 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Elevator/", inputs);
+    Logger.processInputs("Elevator", inputs);
   }
 }

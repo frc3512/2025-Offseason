@@ -1,5 +1,9 @@
 package org.frc3512.robot.constants;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -23,7 +27,10 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.util.Color;
 
 public class Constants {
   public static class GeneralConstants {
@@ -122,6 +129,25 @@ public class Constants {
             .setLampLEDBrightness(0.35) // 35% brightness
             .setAlignColorFramesToIntegrationPeriod(true)
             .setProximityIntegrationPeriod(ProximityPeriod.k20ms);
+  }
+
+  public static class LedConstants {
+    public static Distance ledSpacing = Meters.of(1.0 / 35.0);
+
+    public static LEDPattern stow = LEDPattern.solid(Color.kRed);
+
+    public static LEDPattern coral = LEDPattern.solid(Color.kWhite);
+    public static LEDPattern algae = LEDPattern.solid(Color.kCyan);
+
+    public static LEDPattern prep = LEDPattern.solid(Color.kOrange);
+    public static LEDPattern score = LEDPattern.rainbow(255, 128);
+
+    public static LEDPattern intakeCoral = coral.blink(Seconds.of(1));
+    public static LEDPattern intakeAlgae = algae.blink(Seconds.of(1));
+
+    public static LEDPattern preping = prep.blink(Seconds.of(3), Seconds.of(1.5));
+    public static LEDPattern scoring = score.scrollAtAbsoluteSpeed(MetersPerSecond.of(2), ledSpacing);
+
   }
 
   public static class WristConstants {

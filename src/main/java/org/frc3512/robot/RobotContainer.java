@@ -27,6 +27,8 @@ import org.frc3512.robot.subsystems.intake.Intake;
 import org.frc3512.robot.subsystems.intake.IntakeIO;
 import org.frc3512.robot.subsystems.intake.IntakeIOSim;
 import org.frc3512.robot.subsystems.intake.IntakeIOTalonFX;
+import org.frc3512.robot.subsystems.led.Led;
+import org.frc3512.robot.subsystems.led.LedIOReal;
 import org.frc3512.robot.subsystems.wrist.Wrist;
 import org.frc3512.robot.subsystems.wrist.WristIO;
 import org.frc3512.robot.subsystems.wrist.WristIOSim;
@@ -43,9 +45,11 @@ public class RobotContainer {
 
   private Intake intake;
 
+  private Led leds;
+
   private Drive drive;
 
-  private Superstructure actions = new Superstructure(arm, elevator, wrist, intake);
+  private Superstructure actions = new Superstructure(arm, elevator, wrist, intake, leds);
 
   // * Create Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -62,6 +66,8 @@ public class RobotContainer {
         wrist = new Wrist(new WristIOTalonFX());
 
         intake = new Intake(new IntakeIOTalonFX());
+
+        leds = new Led(new LedIOReal());
 
         drive =
             new Drive(

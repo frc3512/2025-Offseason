@@ -8,15 +8,11 @@ public interface IntakeIO {
   public class IntakeIOInputs {
 
     double objectDistance = 0.0;
+    double temperature = 0;
 
-    double velocityRPM = 0.0;
-    double appliedVolts = 0.0;
-    double currentAmps = 0.0;
     boolean hasCoral = false;
     boolean hasAlgae = false;
     boolean isStalled = false;
-    boolean isIntaking = false;
-    double temperature = 0;
 
     double red = 0.0;
     double green = 0.0;

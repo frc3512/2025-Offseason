@@ -1,17 +1,21 @@
 package org.frc3512.robot.superstructure;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import org.frc3512.robot.subsystems.arm.Arm;
 import org.frc3512.robot.subsystems.arm.ArmStates;
 import org.frc3512.robot.subsystems.elevator.Elevator;
 import org.frc3512.robot.subsystems.elevator.ElevatorStates;
 import org.frc3512.robot.subsystems.intake.Intake;
 import org.frc3512.robot.subsystems.intake.IntakeStates;
+import org.frc3512.robot.subsystems.led.Led;
 import org.frc3512.robot.subsystems.wrist.Wrist;
 import org.frc3512.robot.subsystems.wrist.WristStates;
+import org.littletonrobotics.junction.Logger;
 
-public class Superstructure {
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class Superstructure extends SubsystemBase {
 
   // private StateMachine stateMachine;
 
@@ -20,6 +24,8 @@ public class Superstructure {
   Wrist wrist;
 
   Intake intake;
+
+  Led leds;
 
   Boolean coralReady = false;
   Boolean bargeReady = false;
@@ -31,18 +37,17 @@ public class Superstructure {
     ALGAE
   }
 
-  public driverMode currentMode;
+  public driverMode currentMode = driverMode.CORAL;
 
-  // All subsystems have a reset to stow if we do not meet conditions for action
-  public Superstructure(Arm arm, Elevator elevator, Wrist wrist, Intake intake) {
-
-    // stateMachine = new StateMachine();
-
+  // All subsystems have a reset to stow if we do not meet conditions for the action
+  public Superstructure(Arm arm, Elevator elevator, Wrist wrist, Intake intake, Led leds) {
     this.arm = arm;
     this.elevator = elevator;
     this.wrist = wrist;
 
     this.intake = intake;
+
+    this.leds = leds;
   }
 
   public void setMode(driverMode mode) {
@@ -106,11 +111,13 @@ public class Superstructure {
   public Command prepTrough() {
     if (intake.hasCoral()) {
       return Commands.sequence(
-          Commands.parallel(
-              arm.changeSetpoint(ArmStates.TROUGH),
-              elevator.changeSetpoint(ElevatorStates.TROUGH),
-              wrist.changeSetpoint(WristStates.TROUGH),
-              intake.changeSetpoint(IntakeStates.STOPPED)),
+          Commands.runOnce(
+              () ->
+                  setState(
+                      ArmStates.TROUGH,
+                      ElevatorStates.TROUGH,
+                      WristStates.TROUGH,
+                      IntakeStates.STOPPED)),
           Commands.runOnce(() -> coralReady = true));
 
     } else {
@@ -121,11 +128,7 @@ public class Superstructure {
   public Command placeTrough() {
     if (coralReady) {
       return Commands.sequence(
-          Commands.parallel(
-              arm.changeSetpoint(ArmStates.TROUGH),
-              elevator.changeSetpoint(ElevatorStates.TROUGH),
-              wrist.changeSetpoint(WristStates.TROUGH),
-              intake.changeSetpoint(IntakeStates.SPIT)),
+          Commands.runOnce(() -> setState(null, null, null, IntakeStates.SPIT)),
           Commands.waitSeconds(0.5),
           stow(),
           Commands.runOnce(() -> coralReady = false));
@@ -170,6 +173,7 @@ public class Superstructure {
   }
 
   // * --- Full system updates
+  // ! null parameters will result in leaving the current state as is
   public Command setState(
       ArmStates armState,
       ElevatorStates elevatorState,
@@ -181,5 +185,15 @@ public class Superstructure {
         elevator.changeSetpoint(elevatorState),
         wrist.changeSetpoint(wristState),
         intake.changeSetpoint(intakeState));
+  }
+
+  @Override
+  public void periodic() {
+
+    Logger.recordOutput("Data/Driver Mode", currentMode);
+
+    Logger.recordOutput("Data/Coral Ready", coralReady);
+    Logger.recordOutput("Data/Barge Ready", bargeReady);
+    Logger.recordOutput("Data/Process Ready", processorReady);
   }
 }
