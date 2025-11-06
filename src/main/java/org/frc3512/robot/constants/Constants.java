@@ -146,8 +146,8 @@ public class Constants {
     public static LEDPattern intakeAlgae = algae.blink(Seconds.of(1));
 
     public static LEDPattern preping = prep.blink(Seconds.of(3), Seconds.of(1.5));
-    public static LEDPattern scoring = score.scrollAtAbsoluteSpeed(MetersPerSecond.of(2), ledSpacing);
-
+    public static LEDPattern scoring =
+        score.scrollAtAbsoluteSpeed(MetersPerSecond.of(2), ledSpacing);
   }
 
   public static class WristConstants {

@@ -1,10 +1,9 @@
 package org.frc3512.robot.subsystems.led;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class Led extends SubsystemBase {
 
@@ -15,7 +14,6 @@ public class Led extends SubsystemBase {
     this.io = io;
   }
 
-
   public Command setPattern(LedStates state) {
     return Commands.runOnce(() -> io.setPattern(state));
   }
@@ -25,5 +23,4 @@ public class Led extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("Led", inputs);
   }
-
 }

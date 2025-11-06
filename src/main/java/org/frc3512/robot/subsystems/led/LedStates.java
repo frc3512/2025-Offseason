@@ -1,27 +1,24 @@
 package org.frc3512.robot.subsystems.led;
 
+import edu.wpi.first.wpilibj.LEDPattern;
 import org.frc3512.robot.constants.Constants.LedConstants;
 
-import edu.wpi.first.wpilibj.LEDPattern;
-
 public enum LedStates {
+  STOWED(LedConstants.stow),
 
-    STOWED(LedConstants.stow),
-    
-    CORAL(LedConstants.coral),
-    ALGAE(LedConstants.algae),
+  CORAL(LedConstants.coral),
+  ALGAE(LedConstants.algae),
 
-    INTAKE_CORAL(LedConstants.intakeCoral),
-    INTAKE_ALGAE(LedConstants.intakeAlgae),
+  INTAKE_CORAL(LedConstants.intakeCoral),
+  INTAKE_ALGAE(LedConstants.intakeAlgae),
 
-    PREPPING(LedConstants.preping),
+  PREPPING(LedConstants.preping),
 
-    SCORING(LedConstants.scoring);
-    
-    LEDPattern pattern;
+  SCORING(LedConstants.scoring);
 
-    LedStates(LEDPattern pattern) {
-        this.pattern = pattern;
-    }
+  LEDPattern pattern;
 
+  LedStates(LEDPattern pattern) {
+    this.pattern = pattern;
+  }
 }

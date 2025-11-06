@@ -1,5 +1,8 @@
 package org.frc3512.robot.superstructure;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.frc3512.robot.subsystems.arm.Arm;
 import org.frc3512.robot.subsystems.arm.ArmStates;
 import org.frc3512.robot.subsystems.elevator.Elevator;
@@ -10,10 +13,6 @@ import org.frc3512.robot.subsystems.led.Led;
 import org.frc3512.robot.subsystems.wrist.Wrist;
 import org.frc3512.robot.subsystems.wrist.WristStates;
 import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Superstructure extends SubsystemBase {
 
