@@ -27,7 +27,6 @@ import org.frc3512.robot.subsystems.wrist.WristIOSim;
 import org.frc3512.robot.subsystems.wrist.WristIOTalonFX;
 import org.frc3512.robot.superstructure.Superstructure;
 
-@SuppressWarnings("unused")
 public class RobotContainer {
 
   private Arm arm;

@@ -155,11 +155,10 @@ public class Superstructure extends SubsystemBase {
 
   // * Coral
   public Command placeLogic(ElevatorStates scoringLevel) {
-    if (scoringLevel == ElevatorStates.L2 || scoringLevel == ElevatorStates.L3) {
-      return placeMid();
-    } else {
-      return placeL4();
-    }
+    return Commands.either(
+      placeL4(), 
+      placeMid(),
+      () -> scoringLevel == ElevatorStates.L4);
   }
 
   // | L4
@@ -306,7 +305,8 @@ public class Superstructure extends SubsystemBase {
     return Commands.sequence(
         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_ALGAE)),
         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.STOW)),
-        Commands.runOnce(() -> wrist.changeSetpoint(WristStates.ALGAE)));
+        Commands.runOnce(() -> wrist.changeSetpoint(WristStates.ALGAE)),
+        Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.HOLD)));
     // } else {
     //     return reset();
     // }
@@ -320,85 +320,73 @@ public class Superstructure extends SubsystemBase {
         Commands.runOnce(() -> bargeReady = true));
   }
 
-  public void doIntakeLogic() {
-    if (currentMode == driverMode.CORAL) {
-      intakeCoral();
-    } else {
-      intakeAlgae();
-    }
+  public Command doIntakeLogic() {
+    return Commands.either(
+      intakeCoral(),
+      intakeAlgae(),
+      () -> currentMode == driverMode.CORAL);
   }
 
-  public void doPrepLogic() {
-    if (currentMode == driverMode.CORAL) {
-      prepCoral();
-    } else {
-      prepAlgae();
-    }
+  public Command doPrepLogic() {
+    return Commands.either(
+      prepCoral(),
+      prepAlgae(),
+      () -> currentMode == driverMode.CORAL);
   }
 
   // Logic for ABXY button PRESS
-  public void doPushLogic(char button) {
+  public Command doPushLogic(char button) {
     switch (button) {
       case 'b':
-        if (currentMode == driverMode.CORAL) {
-          prepTrough();
-        } else {
-          prepProcess();
-        }
-        break;
+      return Commands.either(
+        prepTrough(),
+        prepProcess(),
+        () -> currentMode == driverMode.CORAL);
 
       case 'a':
-        if (currentMode == driverMode.CORAL) {
-          prepMidPlace(ElevatorStates.L2);
-        } else {
-          grabAlgaeReef(ElevatorStates.ALGAE_L1);
-        }
-        break;
+      return Commands.either(
+        prepMidPlace(ElevatorStates.L2),
+        grabAlgaeReef(ElevatorStates.ALGAE_L1),
+        () -> currentMode == driverMode.CORAL);
 
       case 'x':
-        if (currentMode == driverMode.CORAL) {
-          prepMidPlace(ElevatorStates.L3);
-        } else {
-          prepBarge();
-        }
-        break;
+      return Commands.either(
+        prepMidPlace(ElevatorStates.L3),
+        prepBarge(),
+        () -> currentMode == driverMode.CORAL);
 
       case 'y':
-        if (currentMode == driverMode.CORAL) {
-          prepL4();
-        } else {
-          grabAlgaeReef(ElevatorStates.ALGAE_L2);
-        }
+      return Commands.either(
+        prepL4(),
+        grabAlgaeReef(ElevatorStates.ALGAE_L2),
+        () -> currentMode == driverMode.CORAL);
+      
+      default:
+        return reset();
     }
   }
 
   // Logic for ABXY button RELEASE
-  public void doReleaseLogic(char button) {
+  public Command doReleaseLogic(char button) {
     switch (button) {
       case 'b':
-        if (currentMode == driverMode.CORAL) {
-          trough();
-        } else {
-          process();
-        }
-        break;
-
+        return Commands.either(
+          trough(),
+          process(),
+          () -> currentMode == driverMode.CORAL);
+      
       case 'a':
         if (currentMode == driverMode.ALGAE) {
-          prepAlgae();
+          return prepAlgae();
         }
-        break;
 
       case 'x':
         if (currentMode == driverMode.ALGAE) {
-          scoreBarge();
+          return scoreBarge();
         }
-        break;
 
-      case 'y':
-        if (currentMode == driverMode.ALGAE) {
-          prepAlgae();
-        }
+      default:
+        return reset();
     }
   }
 
