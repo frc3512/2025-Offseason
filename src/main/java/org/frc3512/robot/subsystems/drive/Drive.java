@@ -34,6 +34,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
+import java.util.Arrays;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.frc3512.robot.constants.Constants.GeneralConstants;
@@ -352,5 +354,50 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
+  }
+
+   public ChassisSpeeds getVelocityRobotRelative() {
+    var speeds =
+        kinematics.toChassisSpeeds(
+            Arrays.stream(modules).map((m) -> m.getState()).toArray(SwerveModuleState[]::new));
+    return new ChassisSpeeds(
+        speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+  }
+
+  /**
+   * @return The velocity of the robot in field relative coordinates
+   */
+  public ChassisSpeeds getVelocityFieldRelative() {
+    var speeds =
+        kinematics.toChassisSpeeds(
+            Arrays.stream(modules).map(m -> m.getState()).toArray(SwerveModuleState[]::new));
+    speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getPose().getRotation());
+    return speeds;
+  }
+
+  public void drive(ChassisSpeeds speeds) {
+    drive(speeds, false);
+  }
+
+  /**
+   * Runs the drivetrain at the given robot relative speeds
+   *
+   * @param speeds The desired robot relative speeds
+   */
+  public void drive(ChassisSpeeds speeds, boolean openLoop) {
+
+    speeds = ChassisSpeeds.discretize(speeds, 0.02);
+    final SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, TunerConstants.maxSpeed);
+    final SwerveModuleState[] optimizedModuleStates = new SwerveModuleState[moduleStates.length];
+
+    for (int i = 0; i < moduleStates.length; i++) {
+      optimizedModuleStates[i] = modules[i].runSetpoint(moduleStates[i]); // Run setpoints
+    }
+
+    Logger.recordOutput("Swerve/ModuleSetpoints", optimizedModuleStates);
+    Logger.recordOutput(
+        "Swerve/ModuleStates",
+        Arrays.stream(modules).map(m -> m.getState()).toArray(SwerveModuleState[]::new));
   }
 }
