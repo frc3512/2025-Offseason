@@ -43,14 +43,9 @@ public class RobotContainer {
 
   private Intake intake;
 
-  // private Led leds;
-
   private Drive drive;
 
   private Superstructure actions;
-
-  // * Create Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
 
   // ? Create Vision
 
@@ -65,10 +60,6 @@ public class RobotContainer {
 
         intake = new Intake(new IntakeIOTalonFX());
 
-        // leds = new Led(new LedIOReal());
-
-        actions = new Superstructure(arm, elevator, wrist, intake);
-
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -76,7 +67,10 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-        break;
+
+        actions = new Superstructure(arm, elevator, wrist, intake, drive);
+
+      break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
@@ -86,8 +80,6 @@ public class RobotContainer {
 
         intake = new Intake(new IntakeIOSim());
 
-        actions = new Superstructure(arm, elevator, wrist, intake);
-
         drive =
             new Drive(
                 new GyroIO() {},
@@ -96,7 +88,9 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
 
-        break;
+        actions = new Superstructure(arm, elevator, wrist, intake, drive);
+
+      break;
 
       default:
         // Replayed robot, disable IO implementations
@@ -113,72 +107,14 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        break;
+      break;
     }
 
-    configureBindings();
+    actions.configureBindings();
   }
 
-  private void configureAxisActions() {
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY() * TunerConstants.maxSpeed,
-            () -> -controller.getLeftX() * TunerConstants.maxSpeed,
-            () -> -controller.getRightX() * TunerConstants.maxAngularRate));
-  }
-
-  private void configureButtonBindings() {
-
-    // Reset gyro to 0° when B button is pressed
-    resetGyro()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
-
-    // Mode Switcher
-    switchToCoral().onTrue(Commands.runOnce(() -> actions.setMode(driverMode.CORAL)));
-    switchToAlgae().onTrue(Commands.runOnce(() -> actions.setMode(driverMode.ALGAE)));
-
-    // | Intake
-    controller
-        .rightBumper()
-        .onTrue(Commands.runOnce(() -> actions.intakeCoral()))
-        .onFalse(Commands.runOnce(() -> actions.prepCoral()));
-  }
-
-  private void configureBindings() {
-    configureAxisActions();
-    configureButtonBindings();
-  }
 
   public Command getAutonomousCommand() {
     return null;
-  }
-
-  //  * Define triggers here
-
-  // Gyro
-  private Trigger resetGyro() {
-    return controller.rightStick().and(controller.leftStick());
-  }
-
-  // Superstructure
-  private Trigger stow() {
-    return controller.povDown();
-  }
-
-  // Mode Switcher
-  private Trigger switchToCoral() {
-    return controller.start();
-  }
-
-  private Trigger switchToAlgae() {
-    return controller.back();
   }
 }
