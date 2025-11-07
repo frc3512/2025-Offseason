@@ -11,7 +11,13 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   private TalonFX leadMotor;
   private TalonFX followMotor;
 
-  PositionVoltage setpoint = new PositionVoltage(ElevatorStates.STOW.position);
+  private final PositionVoltage positionRequest = new PositionVoltage(ElevatorStates.STOW.position);
+
+  private double desiredState;
+
+  private static double clampHeight(double height) {
+    return MathUtil.clamp(height, 0, 56);
+  }
 
   public ElevatorIOTalonFX() {
 
@@ -42,7 +48,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
 
-    leadMotor.setControl(setpoint);
+    leadMotor.setControl(
+        positionRequest.withPosition(desiredState / ElevatorConstants.PULLEY_CIRCUMFERENCE));
 
     followMotor.setControl(new Follower(leadMotor.getDeviceID(), true));
 
@@ -59,15 +66,12 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         leadMotor.getAcceleration().getValueAsDouble()
             * ElevatorConstants.PULLEY_CIRCUMFERENCE; // Convert rps^2 to ips^2
     inputs.positionSetpoint =
-        setpoint.Position * ElevatorConstants.PULLEY_CIRCUMFERENCE; // Convert rotations to inches
+        positionRequest.Position
+            * ElevatorConstants.PULLEY_CIRCUMFERENCE; // Convert rotations to inches
   }
 
   @Override
   public void changeSetpoint(ElevatorStates newSetpoint) {
-    var inches =
-        MathUtil.clamp(
-            newSetpoint.position, ElevatorConstants.minHeight, ElevatorConstants.maxHeight);
-    setpoint.Position =
-        inches / ElevatorConstants.PULLEY_CIRCUMFERENCE; // Convert degrees to rotations
+    desiredState = clampHeight(newSetpoint.position);
   }
 }

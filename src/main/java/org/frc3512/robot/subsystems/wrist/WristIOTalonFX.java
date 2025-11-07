@@ -9,11 +9,13 @@ public class WristIOTalonFX implements WristIO {
 
   private TalonFX motor;
 
-  PositionVoltage setpoint = new PositionVoltage(WristStates.STOW.degrees);
+  private PositionVoltage positionRequest = new PositionVoltage(WristStates.CORAL.degrees);
+
+  private double desiredState;
 
   public WristIOTalonFX() {
 
-    motor = new TalonFX(15);
+    motor = new TalonFX(WristConstants.ID);
 
     motor.getConfigurator().apply(WristConstants.config);
 
@@ -35,7 +37,7 @@ public class WristIOTalonFX implements WristIO {
   @Override
   public void updateInputs(WristIOInputs inputs) {
 
-    motor.setControl(setpoint);
+    motor.setControl(positionRequest.withPosition(desiredState / 360.0));
 
     // Update inputs
     inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
@@ -45,12 +47,11 @@ public class WristIOTalonFX implements WristIO {
     inputs.motorVelocity = motor.getVelocity().getValueAsDouble() * 360; // Convert rps to dps
     inputs.motorAcceleration =
         motor.getAcceleration().getValueAsDouble() * 360; // Convert rps^2 to dps^2
-    inputs.positionSetpoint = setpoint.Position * 360; // Convert rotations to degrees
+    inputs.positionSetpoint = positionRequest.Position * 360; // Convert rotations to degrees
   }
 
   @Override
   public void changeSetpoint(WristStates newSetpoint) {
-    var degrees = MathUtil.clamp(newSetpoint.degrees, -5, 95);
-    setpoint.Position = degrees / 360.0; // Convert degrees to rotations
+    desiredState = MathUtil.clamp(newSetpoint.degrees, -95, 95);
   }
 }

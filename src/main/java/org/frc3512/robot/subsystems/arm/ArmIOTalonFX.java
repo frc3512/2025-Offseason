@@ -11,7 +11,9 @@ public class ArmIOTalonFX implements ArmIO {
   private TalonFX motor;
   private Canandmag encoder;
 
-  PositionVoltage setpoint = new PositionVoltage(ArmStates.STOW.degrees);
+  private PositionVoltage positionRequest = new PositionVoltage(ArmStates.STOW.degrees);
+
+  private double desiredState;
 
   public ArmIOTalonFX() {
 
@@ -43,7 +45,7 @@ public class ArmIOTalonFX implements ArmIO {
   @Override
   public void updateInputs(ArmIOInputs inputs) {
 
-    motor.setControl(setpoint);
+    motor.setControl(positionRequest.withPosition(desiredState / 360.0));
 
     // Update inputs
     inputs.motorVoltage = motor.getMotorVoltage().getValueAsDouble();
@@ -53,12 +55,11 @@ public class ArmIOTalonFX implements ArmIO {
     inputs.motorVelocity = motor.getVelocity().getValueAsDouble() * 360; // Convert rps to dps
     inputs.motorAcceleration =
         motor.getAcceleration().getValueAsDouble() * 360; // Convert rps^2 to dps^2
-    inputs.positionSetpoint = setpoint.Position * 360; // Convert rotations to degrees
+    inputs.positionSetpoint = positionRequest.Position * 360; // Convert rotations to degrees
   }
 
   @Override
   public void changeSetpoint(ArmStates newSetpoint) {
-    var degrees = MathUtil.clamp(newSetpoint.degrees, -120, 120);
-    setpoint.Position = degrees / 360.0; // Convert degrees to rotations
+    desiredState = MathUtil.clamp(newSetpoint.degrees, -123, 123);
   }
 }

@@ -148,11 +148,8 @@ public class RobotContainer {
     // | Intake
     controller
         .rightBumper()
-        .onTrue(
-            Commands.runOnce(() -> actions.doIntakeLogic())
-                .until(() -> intake.hasCoral() || intake.hasAlgae())
-                .andThen(() -> Commands.runOnce(() -> actions.doPrepLogic())))
-        .onFalse(Commands.runOnce(() -> actions.doPrepLogic()));
+        .onTrue(Commands.runOnce(() -> actions.intakeCoral()))
+        .onFalse(Commands.runOnce(() -> actions.prepCoral()));
   }
 
   private void configureBindings() {
