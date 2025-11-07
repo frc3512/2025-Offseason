@@ -15,8 +15,6 @@ import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
 
-  // private StateMachine stateMachine;
-
   Arm arm;
   Elevator elevator;
   Wrist wrist;

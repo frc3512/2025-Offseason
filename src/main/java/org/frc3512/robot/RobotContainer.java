@@ -47,7 +47,7 @@ public class RobotContainer {
 
   private Drive drive;
 
-  private Superstructure actions = new Superstructure(arm, elevator, wrist, intake);
+  private Superstructure actions;
 
   // * Create Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -67,6 +67,8 @@ public class RobotContainer {
 
         // leds = new Led(new LedIOReal());
 
+        actions = new Superstructure(arm, elevator, wrist, intake);
+
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -83,6 +85,8 @@ public class RobotContainer {
         wrist = new Wrist(new WristIOSim());
 
         intake = new Intake(new IntakeIOSim());
+
+        actions = new Superstructure(arm, elevator, wrist, intake);
 
         drive =
             new Drive(
