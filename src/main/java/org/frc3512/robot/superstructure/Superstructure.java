@@ -9,7 +9,6 @@ import org.frc3512.robot.subsystems.elevator.Elevator;
 import org.frc3512.robot.subsystems.elevator.ElevatorStates;
 import org.frc3512.robot.subsystems.intake.Intake;
 import org.frc3512.robot.subsystems.intake.IntakeStates;
-import org.frc3512.robot.subsystems.led.Led;
 import org.frc3512.robot.subsystems.wrist.Wrist;
 import org.frc3512.robot.subsystems.wrist.WristStates;
 import org.littletonrobotics.junction.Logger;
@@ -24,8 +23,6 @@ public class Superstructure extends SubsystemBase {
 
   Intake intake;
 
-  Led leds;
-
   Boolean coralReady = false;
   Boolean bargeReady = false;
   Boolean processorReady = false;
@@ -39,14 +36,12 @@ public class Superstructure extends SubsystemBase {
   public driverMode currentMode = driverMode.CORAL;
 
   // All subsystems have a reset to stow if we do not meet conditions for the action
-  public Superstructure(Arm arm, Elevator elevator, Wrist wrist, Intake intake, Led leds) {
+  public Superstructure(Arm arm, Elevator elevator, Wrist wrist, Intake intake) {
     this.arm = arm;
     this.elevator = elevator;
     this.wrist = wrist;
 
     this.intake = intake;
-
-    this.leds = leds;
   }
 
   public void setMode(driverMode mode) {
@@ -127,13 +122,7 @@ public class Superstructure extends SubsystemBase {
   public Command placeTrough() {
     if (coralReady) {
       return Commands.sequence(
-          Commands.runOnce(
-              () -> 
-                setState(
-                    null, 
-                  null, 
-                  null, 
-                  IntakeStates.SPIT)),
+          Commands.runOnce(() -> setState(null, null, null, IntakeStates.SPIT)),
           Commands.waitSeconds(0.5),
           stow(),
           Commands.runOnce(() -> coralReady = false));
@@ -147,12 +136,7 @@ public class Superstructure extends SubsystemBase {
     if (intake.hasCoral()) {
       return Commands.sequence(
           Commands.runOnce(
-              () -> 
-                  setState(
-                  ArmStates.PREP_MID,
-                  level,
-                  WristStates.CORAL,
-                  IntakeStates.STOPPED)),
+              () -> setState(ArmStates.PREP_MID, level, WristStates.CORAL, IntakeStates.STOPPED)),
           Commands.runOnce(() -> coralReady = true));
 
     } else {

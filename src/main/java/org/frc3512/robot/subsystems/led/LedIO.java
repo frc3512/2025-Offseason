@@ -1,15 +1,15 @@
-package org.frc3512.robot.subsystems.led;
+// package org.frc3512.robot.subsystems.led;
 
-import org.littletonrobotics.junction.AutoLog;
+// import org.littletonrobotics.junction.AutoLog;
 
-public interface LedIO {
+// public interface LedIO {
 
-  @AutoLog
-  public class LedIOInputs {
-    String ledColor;
-  }
+//   @AutoLog
+//   public class LedIOInputs {
+//     String ledColor;
+//   }
 
-  public default void setPattern(LedStates pattern) {}
+//   public default void setPattern(LedStates pattern) {}
 
-  public default void updateInputs(LedIOInputs inputs) {}
-}
+//   public default void updateInputs(LedIOInputs inputs) {}
+// }
