@@ -1,12 +1,6 @@
 package org.frc3512.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import org.frc3512.robot.commands.DriveCommands;
 import org.frc3512.robot.constants.Constants.GeneralConstants;
 import org.frc3512.robot.constants.TunerConstants;
 import org.frc3512.robot.subsystems.arm.Arm;
@@ -32,7 +26,6 @@ import org.frc3512.robot.subsystems.wrist.WristIO;
 import org.frc3512.robot.subsystems.wrist.WristIOSim;
 import org.frc3512.robot.subsystems.wrist.WristIOTalonFX;
 import org.frc3512.robot.superstructure.Superstructure;
-import org.frc3512.robot.superstructure.Superstructure.driverMode;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -70,7 +63,7 @@ public class RobotContainer {
 
         actions = new Superstructure(arm, elevator, wrist, intake, drive);
 
-      break;
+        break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
@@ -90,7 +83,7 @@ public class RobotContainer {
 
         actions = new Superstructure(arm, elevator, wrist, intake, drive);
 
-      break;
+        break;
 
       default:
         // Replayed robot, disable IO implementations
@@ -107,12 +100,11 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-      break;
+        break;
     }
 
     actions.configureBindings();
   }
-
 
   public Command getAutonomousCommand() {
     return null;

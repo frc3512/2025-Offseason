@@ -1,5 +1,12 @@
 package org.frc3512.robot.superstructure;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.frc3512.robot.commands.DriveCommands;
 import org.frc3512.robot.constants.TunerConstants;
 import org.frc3512.robot.subsystems.arm.Arm;
@@ -12,14 +19,6 @@ import org.frc3512.robot.subsystems.intake.IntakeStates;
 import org.frc3512.robot.subsystems.wrist.Wrist;
 import org.frc3512.robot.subsystems.wrist.WristStates;
 import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class Superstructure extends SubsystemBase {
 
@@ -65,15 +64,17 @@ public class Superstructure extends SubsystemBase {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-              () -> -controller.getLeftY() * TunerConstants.maxSpeed,
-              () -> -controller.getLeftX() * TunerConstants.maxSpeed,
-              () -> -controller.getRightX() * TunerConstants.maxAngularRate));
+            () -> -controller.getLeftY() * TunerConstants.maxSpeed,
+            () -> -controller.getLeftX() * TunerConstants.maxSpeed,
+            () -> -controller.getRightX() * TunerConstants.maxAngularRate));
   }
 
   private void configureButtonBindings() {
 
     // Reset gyro to 0° when both sticks are pressed
-    controller.rightStick().and(controller.leftStick())
+    controller
+        .rightStick()
+        .and(controller.leftStick())
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -87,34 +88,39 @@ public class Superstructure extends SubsystemBase {
     controller.back().onTrue(Commands.runOnce(() -> setMode(driverMode.ALGAE)));
 
     // | Intake
-    controller.leftTrigger()
+    controller
+        .leftTrigger()
         .onTrue(Commands.runOnce(() -> doIntakeLogic()))
         .onFalse(Commands.runOnce(() -> doPrepLogic()));
 
     // | Coral Score
-    controller.rightTrigger()
+    controller
+        .rightTrigger()
         .onTrue(Commands.runOnce(() -> placeLogic(scoringLevel)))
         .onFalse(Commands.runOnce(() -> score()));
 
     // | Face Buttons
-    controller.b()
-      .onTrue(Commands.runOnce(() -> doPushLogic('b')))
-      .onFalse(Commands.runOnce(() -> doReleaseLogic('b')));
+    controller
+        .b()
+        .onTrue(Commands.runOnce(() -> doPushLogic('b')))
+        .onFalse(Commands.runOnce(() -> doReleaseLogic('b')));
 
-    controller.a()
-      .onTrue(Commands.runOnce(() -> doPushLogic('a')))
-      .onFalse(Commands.runOnce(() -> doReleaseLogic('a')));
+    controller
+        .a()
+        .onTrue(Commands.runOnce(() -> doPushLogic('a')))
+        .onFalse(Commands.runOnce(() -> doReleaseLogic('a')));
 
-    controller.x()
-      .onTrue(Commands.runOnce(() -> doPushLogic('x')))
-      .onFalse(Commands.runOnce(() -> doReleaseLogic('x')));
+    controller
+        .x()
+        .onTrue(Commands.runOnce(() -> doPushLogic('x')))
+        .onFalse(Commands.runOnce(() -> doReleaseLogic('x')));
 
-    controller.y()
-      .onTrue(Commands.runOnce(() -> doPushLogic('y')))
-      .onFalse(Commands.runOnce(() -> doReleaseLogic('y')));
+    controller
+        .y()
+        .onTrue(Commands.runOnce(() -> doPushLogic('y')))
+        .onFalse(Commands.runOnce(() -> doReleaseLogic('y')));
 
-    controller.povDown()
-      .onTrue(Commands.runOnce(() -> reset()));
+    controller.povDown().onTrue(Commands.runOnce(() -> reset()));
   }
 
   public void configureBindings() {
@@ -137,34 +143,28 @@ public class Superstructure extends SubsystemBase {
   public Command reset() {
     return Commands.sequence(
         Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.STOPPED)),
-
         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.STOW)),
         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.STOW)),
         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)),
-
         Commands.runOnce(() -> coralReady = false),
         Commands.runOnce(() -> bargeReady = false),
         Commands.runOnce(() -> processorReady = false),
-
         Commands.runOnce(() -> scoringLevel = null),
-
         Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
   }
 
   // * Coral
   public Command placeLogic(ElevatorStates scoringLevel) {
-    if (scoringLevel == ElevatorStates.L2 ||
-        scoringLevel == ElevatorStates.L3) {
+    if (scoringLevel == ElevatorStates.L2 || scoringLevel == ElevatorStates.L3) {
       return placeMid();
     } else {
       return placeL4();
-    }   
-  } 
+    }
+  }
 
   // | L4
   public Command placeL4() {
-    return Commands.sequence(
-      Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_L4)));
+    return Commands.sequence(Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_L4)));
   }
 
   // | L2 - L3
@@ -292,11 +292,11 @@ public class Superstructure extends SubsystemBase {
 
   public Command prepCoral() {
     if (intake.hasCoral()) {
-    return Commands.sequence(
-        Commands.runOnce(() -> arm.changeSetpoint(ArmStates.HOLD_CORAL)),
-        Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)));
+      return Commands.sequence(
+          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.HOLD_CORAL)),
+          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)));
     } else {
-        return reset();
+      return reset();
     }
   }
 
@@ -345,15 +345,15 @@ public class Superstructure extends SubsystemBase {
         } else {
           prepProcess();
         }
-      break;
-      
+        break;
+
       case 'a':
         if (currentMode == driverMode.CORAL) {
           prepMidPlace(ElevatorStates.L2);
         } else {
           grabAlgaeReef(ElevatorStates.ALGAE_L1);
         }
-      break;
+        break;
 
       case 'x':
         if (currentMode == driverMode.CORAL) {
@@ -361,7 +361,7 @@ public class Superstructure extends SubsystemBase {
         } else {
           prepBarge();
         }
-      break;
+        break;
 
       case 'y':
         if (currentMode == driverMode.CORAL) {
@@ -375,25 +375,25 @@ public class Superstructure extends SubsystemBase {
   // Logic for ABXY button RELEASE
   public void doReleaseLogic(char button) {
     switch (button) {
-      case 'b': 
+      case 'b':
         if (currentMode == driverMode.CORAL) {
           trough();
         } else {
           process();
         }
-      break;
+        break;
 
       case 'a':
         if (currentMode == driverMode.ALGAE) {
           prepAlgae();
         }
-      break;
+        break;
 
       case 'x':
         if (currentMode == driverMode.ALGAE) {
           scoreBarge();
         }
-      break;
+        break;
 
       case 'y':
         if (currentMode == driverMode.ALGAE) {
