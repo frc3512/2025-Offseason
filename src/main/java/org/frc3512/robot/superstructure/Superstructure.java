@@ -127,7 +127,13 @@ public class Superstructure extends SubsystemBase {
   public Command placeTrough() {
     if (coralReady) {
       return Commands.sequence(
-          Commands.runOnce(() -> setState(null, null, null, IntakeStates.SPIT)),
+          Commands.runOnce(
+              () -> 
+                setState(
+                    null, 
+                  null, 
+                  null, 
+                  IntakeStates.SPIT)),
           Commands.waitSeconds(0.5),
           stow(),
           Commands.runOnce(() -> coralReady = false));
@@ -140,11 +146,13 @@ public class Superstructure extends SubsystemBase {
   public Command prepMid(ElevatorStates level) {
     if (intake.hasCoral()) {
       return Commands.sequence(
-          Commands.parallel(
-              elevator.changeSetpoint(level),
-              arm.changeSetpoint(ArmStates.PREP_MID),
-              wrist.changeSetpoint(WristStates.CORAL),
-              intake.changeSetpoint(IntakeStates.STOPPED)),
+          Commands.runOnce(
+              () -> 
+                  setState(
+                  ArmStates.PREP_MID,
+                  level,
+                  WristStates.CORAL,
+                  IntakeStates.STOPPED)),
           Commands.runOnce(() -> coralReady = true));
 
     } else {
