@@ -1,13 +1,11 @@
 package org.frc3512.robot.superstructure;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.frc3512.robot.commands.DriveCommands;
+import org.frc3512.robot.constants.Constants;
+import org.frc3512.robot.constants.Constants.FieldConstants.ReefSlot;
 import org.frc3512.robot.constants.TunerConstants;
 import org.frc3512.robot.subsystems.arm.Arm;
 import org.frc3512.robot.subsystems.arm.ArmStates;
@@ -18,7 +16,18 @@ import org.frc3512.robot.subsystems.intake.Intake;
 import org.frc3512.robot.subsystems.intake.IntakeStates;
 import org.frc3512.robot.subsystems.wrist.Wrist;
 import org.frc3512.robot.subsystems.wrist.WristStates;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class Superstructure extends SubsystemBase {
 
@@ -36,6 +45,12 @@ public class Superstructure extends SubsystemBase {
   Boolean coralReady = false;
   Boolean bargeReady = false;
   Boolean processorReady = false;
+
+  @AutoLogOutput(key = "RobotStates/Selected Reef")
+  private String selectedReef = "Left"; // Selected Reef Pole
+
+  @AutoLogOutput(key = "RobotStates/Selected Piece")
+  private String selectedPiece = "Coral"; // Wanted Visio piece
 
   // * Create Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -388,6 +403,70 @@ public class Superstructure extends SubsystemBase {
       default:
         return reset();
     }
+  }
+
+  // Gets the closest reef sector to the robot.
+  @AutoLogOutput(key = "RobotStates/Nearest Reef")
+  public Pose2d getNearestReef() {
+
+    // Grab the alliance color
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+
+    // Create an array of reef slots based on the alliance color
+    ReefSlot[] reefSlots = new ReefSlot[6];
+
+    // Set the reef slots based on the alliance color
+    if (alliance == Alliance.Red) {
+      reefSlots =
+          new ReefSlot[] {
+            Constants.FieldConstants.ReefPoses.Reef_1.red,
+            Constants.FieldConstants.ReefPoses.Reef_2.red,
+            Constants.FieldConstants.ReefPoses.Reef_3.red,
+            Constants.FieldConstants.ReefPoses.Reef_4.red,
+            Constants.FieldConstants.ReefPoses.Reef_5.red,
+            Constants.FieldConstants.ReefPoses.Reef_6.red
+          };
+    } else {
+      reefSlots =
+          new ReefSlot[] {
+            Constants.FieldConstants.ReefPoses.Reef_1.blue,
+            Constants.FieldConstants.ReefPoses.Reef_2.blue,
+            Constants.FieldConstants.ReefPoses.Reef_3.blue,
+            Constants.FieldConstants.ReefPoses.Reef_4.blue,
+            Constants.FieldConstants.ReefPoses.Reef_5.blue,
+            Constants.FieldConstants.ReefPoses.Reef_6.blue
+          };
+    }
+
+    // Create a list of reef middle poses the robot scores offcenter but this is
+    // used instead just
+    // to select the sector.
+    List<Pose2d> reefMiddles = new ArrayList<>();
+    for (ReefSlot reefSlot : reefSlots) {
+      reefMiddles.add(reefSlot.middle);
+    }
+
+    Pose2d currentPos = drive.getPose(); // Get the current robot pose
+    Pose2d nearestReefMiddle = currentPos.nearest(reefMiddles); // Get the nearest reef middle pose
+    ReefSlot nearestReefSlot =
+        reefSlots[
+            reefMiddles.indexOf(
+                nearestReefMiddle)]; // Get the reef slot of the nearest reef middle pose
+
+    // Return the reef slot based on the selected reef
+    if (selectedPiece == "Coral") {
+      if (selectedReef == "Left") {
+        return nearestReefSlot.left;
+      } else if (selectedReef == "Right") {
+        return nearestReefSlot.right;
+      }
+    } else {
+      return nearestReefSlot.algae;
+    }
+
+    // If the selected reef is invalid return the robot's current pose.
+    Logger.recordOutput("Errors", "Invalid Reef Selected '" + selectedReef + "'");
+    return nearestReefMiddle;
   }
 
   @Override
