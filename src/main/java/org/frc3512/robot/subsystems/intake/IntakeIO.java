@@ -27,6 +27,10 @@ public interface IntakeIO {
     return false;
   }
 
+  public default boolean maybeHasCoral() {
+    return false;
+  }
+
   public default boolean hasAlgae() {
     return false;
   }

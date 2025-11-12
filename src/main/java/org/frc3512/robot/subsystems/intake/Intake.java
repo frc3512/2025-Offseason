@@ -21,6 +21,10 @@ public class Intake extends SubsystemBase {
     return io.hasCoral();
   }
 
+  public boolean maybeHasCoral() {
+    return io.maybeHasCoral();
+  }
+
   public boolean hasAlgae() {
     return io.hasAlgae();
   }

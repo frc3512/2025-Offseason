@@ -74,14 +74,23 @@ public class IntakeIOTalonFX implements IntakeIO {
   }
 
   @Override
+  public boolean maybeHasCoral() {
+    if (getObjectDistance() <= 0.05 && !hasAlgae()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public boolean hasAlgae() {
     if (getObjectDistance() <= 0.05) {
-      if (getRed() >= 0.07
-          && getRed() <= 0.13
-          && getGreen() >= 0.27
-          && getGreen() <= 0.34
-          && getBlue() >= 0.09
-          && getBlue() <= 0.15) {
+      if (getRed() >= 0.05
+          && getRed() <= 0.15
+          && getGreen() >= 0.29
+          && getGreen() <= 0.36
+          && getBlue() >= 0.11
+          && getBlue() <= 0.17) {
         return true;
       } else {
         return false;
