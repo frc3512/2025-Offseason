@@ -25,7 +25,6 @@ import org.frc3512.robot.subsystems.wrist.Wrist;
 import org.frc3512.robot.subsystems.wrist.WristIO;
 import org.frc3512.robot.subsystems.wrist.WristIOSim;
 import org.frc3512.robot.subsystems.wrist.WristIOTalonFX;
-import org.frc3512.robot.superstructure.Superstructure;
 
 public class RobotContainer {
 
@@ -36,8 +35,6 @@ public class RobotContainer {
   private Intake intake;
 
   private Drive drive;
-
-  private Superstructure actions;
 
   // ? Create Vision
 
@@ -60,8 +57,6 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        actions = new Superstructure(arm, elevator, wrist, intake, drive);
-
         break;
 
       case SIM:
@@ -79,8 +74,6 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-
-        actions = new Superstructure(arm, elevator, wrist, intake, drive);
 
         break;
 
@@ -102,10 +95,13 @@ public class RobotContainer {
         break;
     }
 
-    actions.configureBindings();
   }
 
+  // | Autonomous Logic 
+  // todo: Implement autonomous command (if worth time)
   public Command getAutonomousCommand() {
     return null;
   }
+
+  // Place Superstructure logic here until implemented in own file
 }
