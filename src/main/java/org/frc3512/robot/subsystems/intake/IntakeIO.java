@@ -23,6 +23,10 @@ public interface IntakeIO {
 
   public default void changeSetpoint(IntakeStates newSetpoint) {}
 
+  public default String getState() {
+    return IntakeStates.STOPPED.state;
+  }
+
   public default boolean hasCoral() {
     return false;
   }

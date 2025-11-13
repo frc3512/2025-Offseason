@@ -17,4 +17,8 @@ public interface ElevatorIO {
   public default void updateInputs(ElevatorIOInputs inputs) {}
 
   public default void changeSetpoint(ElevatorStates newSetpoint) {}
+
+  public default String getState() {
+    return ElevatorStates.STOW.state;
+  }
 }

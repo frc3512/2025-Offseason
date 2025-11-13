@@ -13,7 +13,8 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   private DutyCycleOut setpoint = new DutyCycleOut(0);
 
-  double currentTime = 0.0;
+  private double currentTime = 0.0;
+  private IntakeStates currentState = IntakeStates.STOPPED;
 
   public IntakeIOTalonFX() {
 
@@ -47,6 +48,11 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public void changeSetpoint(IntakeStates newSetpoint) {
     setpoint.Output = newSetpoint.speed; // Set desired voltage
+  }
+
+  @Override
+  public String getState() {
+    return currentState.state;
   }
 
   @Override

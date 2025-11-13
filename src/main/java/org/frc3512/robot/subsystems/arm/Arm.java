@@ -24,6 +24,10 @@ public class Arm extends SubsystemBase {
     return Math.abs(inputs.positionSetpoint - inputs.motorPosition) < ArmConstants.TOLERANCE;
   }
 
+  public String getState() {
+    return io.getState();
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);

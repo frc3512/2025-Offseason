@@ -18,4 +18,8 @@ public interface WristIO {
   public default void updateInputs(WristIOInputs inputs) {}
 
   public default void changeSetpoint(WristStates newSetpoint) {}
+
+  public default String getState() {
+    return WristStates.STOW.state;
+  }
 }

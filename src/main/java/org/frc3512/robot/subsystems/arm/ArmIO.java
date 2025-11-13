@@ -18,4 +18,8 @@ public interface ArmIO {
   public default void updateInputs(ArmIOInputs inputs) {}
 
   public default void changeSetpoint(ArmStates newSetpoint) {}
+
+  public default String getState() {
+    return ArmStates.STOW.state;
+  }
 }

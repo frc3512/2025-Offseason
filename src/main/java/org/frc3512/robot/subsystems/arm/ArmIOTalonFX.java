@@ -15,6 +15,8 @@ public class ArmIOTalonFX implements ArmIO {
 
   private double desiredState;
 
+  private ArmStates currentState = ArmStates.STOW;
+
   public ArmIOTalonFX() {
 
     motor = new TalonFX(15);
@@ -61,5 +63,11 @@ public class ArmIOTalonFX implements ArmIO {
   @Override
   public void changeSetpoint(ArmStates newSetpoint) {
     desiredState = MathUtil.clamp(newSetpoint.degrees, -123, 123);
+    currentState = newSetpoint;
+  }
+
+  @Override
+  public String getState() {
+    return currentState.state;
   }
 }

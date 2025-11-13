@@ -34,7 +34,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
 import java.util.Arrays;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -356,7 +355,7 @@ public class Drive extends SubsystemBase {
     };
   }
 
-   public ChassisSpeeds getVelocityRobotRelative() {
+  public ChassisSpeeds getVelocityRobotRelative() {
     var speeds =
         kinematics.toChassisSpeeds(
             Arrays.stream(modules).map((m) -> m.getState()).toArray(SwerveModuleState[]::new));

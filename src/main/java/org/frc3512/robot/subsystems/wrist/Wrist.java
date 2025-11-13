@@ -19,6 +19,10 @@ public class Wrist extends SubsystemBase {
     return runOnce(() -> io.changeSetpoint(newSetpoint));
   }
 
+  public String getState() {
+    return io.getState();
+  }
+
   @AutoLogOutput(key = "Mechanism States/Wrist At Setpoint")
   public boolean atSetpoint() {
     return Math.abs(inputs.positionSetpoint - inputs.motorPosition) < WristConstants.TOLERANCE;
