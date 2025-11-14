@@ -41,4 +41,4 @@ Claw shapped intake, for both game peices. Canandcolor mounted in between wheels
 90 Degree wrist, rotates intake to allow ground intake as well as scoring
 
 ## Current Version: 
-2.1.1
+2.1.2

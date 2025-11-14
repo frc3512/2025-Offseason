@@ -175,10 +175,6 @@ public class RobotContainer {
             () -> -controller.getLeftX() * TunerConstants.maxSpeed,
             () -> -controller.getRightX() * TunerConstants.maxAngularRate));
 
-    // Mode Switching
-    controller.start().onTrue(setCoralMode());
-    controller.back().onTrue(setAlgaeMode());
-
     // Reset Gyro
     controller
         .rightStick()
@@ -190,6 +186,10 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    // Mode Switching
+    controller.start().onTrue(setCoralMode());
+    controller.back().onTrue(setAlgaeMode());
 
     // * Home Robot
     controller.povDown().onTrue(homeRobot());
@@ -268,7 +268,7 @@ public class RobotContainer {
           Commands.runOnce(() -> wantedLevel = scoringLevels.L1),
           Commands.runOnce(() -> coralReady = true));
     } else {
-      return prepCoral();
+      return homeRobot();
     }
   }
 
@@ -282,7 +282,7 @@ public class RobotContainer {
           Commands.runOnce(() -> wantedLevel = scoringLevels.L2),
           Commands.runOnce(() -> coralReady = true));
     } else {
-      return prepCoral();
+      return homeRobot();
     }
   }
 
@@ -296,7 +296,7 @@ public class RobotContainer {
           Commands.runOnce(() -> wantedLevel = scoringLevels.L3),
           Commands.runOnce(() -> coralReady = true));
     } else {
-      return prepCoral();
+      return homeRobot();
     }
   }
 
@@ -310,7 +310,7 @@ public class RobotContainer {
           Commands.runOnce(() -> wantedLevel = scoringLevels.L4),
           Commands.runOnce(() -> coralReady = true));
     } else {
-      return prepCoral();
+      return homeRobot();
     }
   }
 
@@ -398,7 +398,7 @@ public class RobotContainer {
         return prepCoral();
       }
     } else {
-      return homeRobot();
+      return doNothing();
     }
   }
 
@@ -534,23 +534,29 @@ public class RobotContainer {
         return prepAlgae();
       }
     } else {
-      return homeRobot();
+      return doNothing();
     }
   }
 
   // * ------ BEGIN DOUBLE BINDING LOGIC ------
 
   public Command runIntakeLogic() {
-    return Commands.either(intakeCoral(), intakeAlgae(), () -> currentMode == driverMode.CORAL);
+    return Commands.either(
+      intakeCoral(), 
+      intakeAlgae(), 
+      () -> currentMode == driverMode.CORAL);
   }
 
   public Command runBLogic() {
-    return Commands.either(prepTrough(), prepProcess(), () -> currentMode == driverMode.CORAL);
+    return Commands.either(
+      prepTrough(), 
+      prepProcess(), 
+      () -> currentMode == driverMode.CORAL);
   }
 
   public Command runALogic() {
     return Commands.either(
-        prepL2(), grabAlgaeReef(ElevatorStates.ALGAE_L2), () -> currentMode == driverMode.CORAL);
+        prepL2(), grabAlgaeReef(ElevatorStates.ALGAE_L1), () -> currentMode == driverMode.CORAL);
   }
 
   public Command runXLogic() {
@@ -567,7 +573,7 @@ public class RobotContainer {
         executeCoralAction(), executeAlgaeAction(), () -> currentMode == driverMode.CORAL);
   }
 
-  // * ------ EXESS LOGIC ------
+  // * ------ EXCESS LOGIC ------
 
   // Used in instances where a case for logic is required but no action is desired
   public Command doNothing() {
