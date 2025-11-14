@@ -196,6 +196,12 @@ public class RobotContainer {
 
     // Intake
     controller.leftTrigger().onTrue(runIntakeLogic());
+    // .whileTrue(
+    //     DriveCommands.joystickDrive(
+    //         drive,
+    //         () -> -controller.getLeftY() * TunerConstants.slowSpeed,
+    //         () -> -controller.getLeftX() * TunerConstants.slowSpeed,
+    //         () -> -controller.getRightX() * TunerConstants.slowAngularRate));
 
     // Prep
     controller.b().onTrue(runBLogic());
@@ -229,14 +235,13 @@ public class RobotContainer {
   }
 
   public Command intakeCoral() {
-    if (!intake.hasCoral() && !intake.hasAlgae() && !intake.maybeHasCoral()) {
-      return Commands.parallel(
-          Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
-          grabCoral(),
+    if (!intake.hasCoral() && !intake.maybeHasCoral()) {
+      return Commands.sequence(
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_CORAL)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)));
-
+          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)),
+          Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
+          grabCoral());
     } else {
       return homeRobot();
     }
@@ -436,10 +441,10 @@ public class RobotContainer {
     if (!intake.hasCoral() && !intake.hasAlgae() && !intake.maybeHasCoral()) {
       return Commands.parallel(
           Commands.runOnce(() -> currentRobotState = States.INTAKING_ALGAE),
-          grabAlgae(),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_ALGAE)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)));
+          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)),
+          grabAlgae());
     } else {
       return homeRobot();
     }
@@ -541,17 +546,11 @@ public class RobotContainer {
   // * ------ BEGIN DOUBLE BINDING LOGIC ------
 
   public Command runIntakeLogic() {
-    return Commands.either(
-      intakeCoral(), 
-      intakeAlgae(), 
-      () -> currentMode == driverMode.CORAL);
+    return Commands.either(intakeCoral(), intakeAlgae(), () -> currentMode == driverMode.CORAL);
   }
 
   public Command runBLogic() {
-    return Commands.either(
-      prepTrough(), 
-      prepProcess(), 
-      () -> currentMode == driverMode.CORAL);
+    return Commands.either(prepTrough(), prepProcess(), () -> currentMode == driverMode.CORAL);
   }
 
   public Command runALogic() {

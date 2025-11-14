@@ -12,7 +12,7 @@ This code is based on the 2025 game, Reefscape. It uses elements like the Reef, 
 
 ## Robot
 
-The robot that this code is being used on is the robot our team constructed over the summer, Karkinos. 
+The robot that this code is being used on is the robot our team constructed over the summer, Karkinos.
 
 ### Robot Features
 
@@ -40,5 +40,5 @@ Claw shapped intake, for both game peices. Canandcolor mounted in between wheels
 
 90 Degree wrist, rotates intake to allow ground intake as well as scoring
 
-## Current Version: 
+## Current Version:
 2.1.2

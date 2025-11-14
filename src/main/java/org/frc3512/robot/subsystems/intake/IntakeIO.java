@@ -13,6 +13,7 @@ public interface IntakeIO {
     boolean hasCoral = false;
     boolean hasAlgae = false;
     boolean isStalled = false;
+    boolean maybeHasCoral = false;
 
     double red = 0.0;
     double green = 0.0;

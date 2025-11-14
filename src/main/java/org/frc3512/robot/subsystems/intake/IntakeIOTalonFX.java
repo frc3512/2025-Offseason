@@ -39,6 +39,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.hasAlgae = hasAlgae();
     inputs.hasCoral = hasCoral();
     inputs.isStalled = isStalled();
+    inputs.maybeHasCoral = maybeHasCoral();
 
     inputs.red = sensor.getRed();
     inputs.green = sensor.getGreen();
