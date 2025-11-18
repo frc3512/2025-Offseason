@@ -2,6 +2,8 @@ package org.frc3512.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -78,6 +80,8 @@ public class RobotContainer {
   private driverMode currentMode = driverMode.CORAL;
 
   private States currentRobotState = States.HOMED;
+
+  Boolean isEmergencyStopped = DriverStation.isEStopped();
 
   // ? Create Vision
 
@@ -191,17 +195,19 @@ public class RobotContainer {
     controller.start().onTrue(setCoralMode());
     controller.back().onTrue(setAlgaeMode());
 
-    // * Home Robot
+    // Home Robot
     controller.povDown().onTrue(homeRobot());
 
     // Intake
-    controller.leftTrigger().onTrue(runIntakeLogic());
-    // .whileTrue(
-    //     DriveCommands.joystickDrive(
-    //         drive,
-    //         () -> -controller.getLeftY() * TunerConstants.slowSpeed,
-    //         () -> -controller.getLeftX() * TunerConstants.slowSpeed,
-    //         () -> -controller.getRightX() * TunerConstants.slowAngularRate));
+    controller
+        .leftTrigger()
+        .onTrue(runIntakeLogic())
+        .whileTrue(
+            DriveCommands.joystickDrive(
+                drive,
+                () -> -controller.getLeftY() * TunerConstants.slowSpeed,
+                () -> -controller.getLeftX() * TunerConstants.slowSpeed,
+                () -> -controller.getRightX() * TunerConstants.slowAngularRate));
 
     // Prep
     controller.b().onTrue(runBLogic());
@@ -211,32 +217,52 @@ public class RobotContainer {
 
     // Execute Action
     controller.rightTrigger().onTrue(maybePlaceCoral()).onFalse(executeAction());
+
   }
 
   // * Home
   public Command homeRobot() {
-    return Commands.parallel(
+    return Commands.sequence(
+        // Reset all mechanisms to stow positions
         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.STOW)),
         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.STOW)),
         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.STOW)),
         Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.STOPPED)),
+        // Reset scoring variables
         Commands.runOnce(() -> coralReady = false),
         Commands.runOnce(() -> bargeReady = false),
         Commands.runOnce(() -> processorReady = false),
+        // Reset states
         Commands.runOnce(() -> wantedLevel = scoringLevels.NONE),
         Commands.runOnce(() -> currentRobotState = States.HOMED),
-        Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()));
+        // Kill any overlapping commands
+        Commands.runOnce(() -> CommandScheduler.getInstance().cancelAll()),
+        // Log that the commands was run
+        logMessage("Homing Robot"),
+        // Buzz controller to indicate completion
+        Commands.runOnce(() -> controller.setRumble(RumbleType.kBothRumble, 1)),
+        Commands.waitSeconds(0.2),
+        Commands.runOnce(() -> controller.setRumble(RumbleType.kBothRumble, 0)));
   }
 
   // * ------ BEGIN CORAL MODE ------
 
   public Command setCoralMode() {
-    return Commands.runOnce(() -> currentMode = driverMode.CORAL);
+    return Commands.sequence(
+        // Set mode
+        Commands.runOnce(() -> currentMode = driverMode.CORAL),
+        // Log mode switch
+        logMessage("Switched to Coral Mode"),
+        // Buzz controller to indicate completion
+        Commands.runOnce(() -> controller.setRumble(RumbleType.kRightRumble, 0.75)),
+        Commands.waitSeconds(0.2),
+        Commands.runOnce(() -> controller.setRumble(RumbleType.kRightRumble, 0)));
   }
 
   public Command intakeCoral() {
     if (!intake.hasCoral() && !intake.maybeHasCoral()) {
       return Commands.sequence(
+          logMessage("Intaking Coral"),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_CORAL)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
           Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)),
@@ -256,6 +282,7 @@ public class RobotContainer {
 
   public Command prepCoral() {
     return Commands.parallel(
+        logMessage("Prepping Coral"),
         Commands.runOnce(() -> currentRobotState = States.PREPPING_CORAL),
         Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.STOPPED)),
         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.HOLD_CORAL)),
@@ -266,6 +293,7 @@ public class RobotContainer {
   public Command prepTrough() {
     if (intake.maybeHasCoral() || intake.hasCoral()) {
       return Commands.parallel(
+          logMessage("Prepping Trough"),
           Commands.runOnce(() -> currentRobotState = States.PREPPING_TROUGH),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.TROUGH)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.TROUGH)),
@@ -280,6 +308,7 @@ public class RobotContainer {
   public Command prepL2() {
     if (intake.maybeHasCoral() || intake.hasCoral()) {
       return Commands.parallel(
+          logMessage("Prepping L2"),
           Commands.runOnce(() -> currentRobotState = States.PREPPING_L2),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_MID)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_L2)),
@@ -294,6 +323,7 @@ public class RobotContainer {
   public Command prepL3() {
     if (intake.maybeHasCoral() || intake.hasCoral()) {
       return Commands.parallel(
+          logMessage("Prepping L3"),
           Commands.runOnce(() -> currentRobotState = States.PREPPING_L3),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_MID)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_L3)),
@@ -308,6 +338,7 @@ public class RobotContainer {
   public Command prepL4() {
     if (intake.maybeHasCoral() || intake.hasCoral()) {
       return Commands.parallel(
+          logMessage("Prepping L4"),
           Commands.runOnce(() -> currentRobotState = States.PREPPING_L4),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_L4)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_l4)),
@@ -322,6 +353,7 @@ public class RobotContainer {
   public Command placeTrough() {
     if (coralReady) {
       return Commands.sequence(
+          logMessage("Placing in Trough"),
           Commands.runOnce(() -> currentRobotState = States.PLACING_TROUGH),
           Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.SPIT)),
           Commands.waitSeconds(0.5),
@@ -334,6 +366,7 @@ public class RobotContainer {
   public Command placeL2() {
     if (coralReady) {
       return Commands.parallel(
+          logMessage("Placing L2"),
           Commands.runOnce(() -> currentRobotState = States.PLACING_L2),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_MID)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PLACE_L2)));
@@ -345,6 +378,7 @@ public class RobotContainer {
   public Command placeL3() {
     if (coralReady) {
       return Commands.parallel(
+          logMessage("Placing L3"),
           Commands.runOnce(() -> currentRobotState = States.PLACING_L3),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_MID)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PLACE_L3)));
@@ -356,6 +390,7 @@ public class RobotContainer {
   public Command placeL4() {
     if (coralReady) {
       return Commands.parallel(
+          logMessage("Placing L4"),
           Commands.runOnce(() -> currentRobotState = States.PLACING_L4),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_L4)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PLACE_L4)));
@@ -367,6 +402,7 @@ public class RobotContainer {
   public Command releaseCoral() {
     if (coralReady) {
       return Commands.sequence(
+          logMessage("Releasing Coral"),
           Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.PLACE)),
           Commands.waitSeconds(0.5),
           homeRobot());
@@ -434,12 +470,21 @@ public class RobotContainer {
   // * ------ BEGIN ALGAE MODE ------
 
   public Command setAlgaeMode() {
-    return Commands.runOnce(() -> currentMode = driverMode.ALGAE);
+    return Commands.sequence(
+        // Set mode
+        Commands.runOnce(() -> currentMode = driverMode.ALGAE),
+        // Log mode switch
+        logMessage("Switched to Algae Mode"),
+        // Buzz controller to indicate completion
+        Commands.runOnce(() -> controller.setRumble(RumbleType.kLeftRumble, 0.75)),
+        Commands.waitSeconds(0.2),
+        Commands.runOnce(() -> controller.setRumble(RumbleType.kLeftRumble, 0)));
   }
 
   public Command intakeAlgae() {
     if (!intake.hasCoral() && !intake.hasAlgae() && !intake.maybeHasCoral()) {
       return Commands.parallel(
+          logMessage("Intaking Algae"),
           Commands.runOnce(() -> currentRobotState = States.INTAKING_ALGAE),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_ALGAE)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
@@ -459,6 +504,7 @@ public class RobotContainer {
 
   public Command prepAlgae() {
     return Commands.parallel(
+        logMessage("Prepping Algae"),
         Commands.runOnce(() -> currentRobotState = States.HOLDING_ALGAE),
         Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.HOLD)),
         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_ALGAE)),
@@ -469,6 +515,7 @@ public class RobotContainer {
   public Command prepProcess() {
     if (intake.hasAlgae()) {
       return Commands.parallel(
+          logMessage("Prepping Processor"),
           Commands.runOnce(() -> currentRobotState = States.PREPPING_PROCESSOR),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PROCESS)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PROCESSOR)),
@@ -482,6 +529,7 @@ public class RobotContainer {
   public Command prepBarge() {
     if (intake.hasAlgae()) {
       return Commands.parallel(
+          logMessage("Prepping Barge"),
           Commands.runOnce(() -> currentRobotState = States.PREPPING_BARGE),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.BARGE)),
           Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.BARGE)),
@@ -495,6 +543,7 @@ public class RobotContainer {
   public Command process() {
     if (processorReady) {
       return Commands.sequence(
+          logMessage("Processing Algae"),
           Commands.runOnce(() -> currentRobotState = States.EJECTING),
           Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.EJECT)),
           Commands.waitSeconds(0.5),
@@ -507,6 +556,7 @@ public class RobotContainer {
   public Command placeBarge() {
     if (bargeReady) {
       return Commands.sequence(
+          logMessage("Placing in Barge"),
           Commands.runOnce(() -> currentRobotState = States.EJECTING),
           Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.EJECT)),
           Commands.waitSeconds(0.5),
@@ -519,6 +569,7 @@ public class RobotContainer {
   public Command grabAlgaeReef(ElevatorStates level) {
     if (!intake.hasAlgae()) {
       return Commands.parallel(
+          logMessage("Grabbing Algae from Reef"),
           checkAlgaeLevel(level),
           grabAlgae(),
           Commands.runOnce(() -> arm.changeSetpoint(ArmStates.REMOVE_ALGAE)),
@@ -582,6 +633,10 @@ public class RobotContainer {
         });
   }
 
+  public Command logMessage(String message) {
+    return Commands.runOnce(() -> Logger.recordOutput("Command Log", message));
+  }
+
   public Command checkAlgaeLevel(ElevatorStates level) {
     if (level == ElevatorStates.ALGAE_L1) {
       return Commands.runOnce(() -> currentRobotState = States.DE_REEFING_A1);
@@ -591,4 +646,5 @@ public class RobotContainer {
       return doNothing();
     }
   }
+
 }
