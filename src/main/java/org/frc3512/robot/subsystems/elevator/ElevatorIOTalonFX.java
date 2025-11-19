@@ -15,8 +15,6 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   private double desiredState;
 
-  private ElevatorStates currentState = ElevatorStates.STOW;
-
   private static double clampHeight(double height) {
     return MathUtil.clamp(height, 0, 56);
   }
@@ -75,11 +73,5 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   @Override
   public void changeSetpoint(ElevatorStates newSetpoint) {
     desiredState = clampHeight(newSetpoint.position);
-    currentState = newSetpoint;
-  }
-
-  @Override
-  public String getState() {
-    return currentState.state;
   }
 }

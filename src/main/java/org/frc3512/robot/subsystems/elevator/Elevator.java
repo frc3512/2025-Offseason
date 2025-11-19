@@ -25,10 +25,6 @@ public class Elevator extends SubsystemBase {
         < ElevatorConstants.heightTolerance;
   }
 
-  public String getState() {
-    return io.getState();
-  }
-
   @Override
   public void periodic() {
     io.updateInputs(inputs);

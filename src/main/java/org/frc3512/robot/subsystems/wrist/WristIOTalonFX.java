@@ -12,7 +12,6 @@ public class WristIOTalonFX implements WristIO {
   private PositionVoltage positionRequest = new PositionVoltage(WristStates.CORAL.degrees);
 
   private double desiredState;
-  private WristStates currentState = WristStates.STOW;
 
   public WristIOTalonFX() {
 
@@ -54,10 +53,5 @@ public class WristIOTalonFX implements WristIO {
   @Override
   public void changeSetpoint(WristStates newSetpoint) {
     desiredState = MathUtil.clamp(newSetpoint.degrees, -95, 95);
-  }
-
-  @Override
-  public String getState() {
-    return currentState.state;
   }
 }

@@ -17,10 +17,6 @@ public class Intake extends SubsystemBase {
     return runOnce(() -> io.changeSetpoint(setpoint));
   }
 
-  public String getState() {
-    return io.getState();
-  }
-
   public boolean hasCoral() {
     return io.hasCoral();
   }
