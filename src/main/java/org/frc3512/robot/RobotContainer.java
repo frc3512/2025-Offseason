@@ -221,7 +221,7 @@ public class RobotContainer {
 
   // * Home
   public Command homeRobot() {
-    return Commands.parallel(
+    return Commands.sequence(
         // Reset all mechanisms to stow positions
         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.STOW)),
         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.STOW)),
@@ -259,11 +259,11 @@ public class RobotContainer {
   }
 
   public Command intakeCoral() {
-    return Commands.parallel(
+    return Commands.sequence(
             logMessage("Intaking Coral"),
-            arm.changeSetpoint(ArmStates.INTAKE_CORAL),
-            elevator.changeSetpoint(ElevatorStates.INTAKE),
-            wrist.changeSetpoint(WristStates.INTAKE),
+            Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_CORAL)),
+            Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
+            Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)),
             Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
             grabCoral())
         .onlyIf(() -> !intake.hasCoral() || !intake.maybeHasCoral());
@@ -283,19 +283,19 @@ public class RobotContainer {
 
   public Command grabCoral() {
     return Commands.sequence(
-        intake.changeSetpoint(IntakeStates.INTAKE),
+        Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.INTAKE)),
         Commands.waitUntil(() -> intake.hasCoral() || intake.maybeHasCoral()),
         prepCoral());
   }
 
   public Command prepCoral() {
-    return Commands.parallel(
+    return Commands.sequence(
         logMessage("Prepping Coral"),
         Commands.runOnce(() -> currentRobotState = States.PREPPING_CORAL),
-        intake.changeSetpoint(IntakeStates.STOPPED),
-        arm.changeSetpoint(ArmStates.HOLD_CORAL),
-        elevator.changeSetpoint(ElevatorStates.PREP_CORAL),
-        wrist.changeSetpoint(WristStates.CORAL));
+        Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.STOPPED)),
+        Commands.runOnce(() -> arm.changeSetpoint(ArmStates.HOLD_CORAL)),
+        Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_CORAL)),
+        Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)));
   }
 
   // public Command prepTrough() {
@@ -478,7 +478,7 @@ public class RobotContainer {
   // // * ------ BEGIN ALGAE MODE ------
 
   public Command setAlgaeMode() {
-    return Commands.parallel(
+    return Commands.sequence(
         // Set mode
         Commands.runOnce(() -> currentMode = driverMode.ALGAE),
         // Log mode switch
@@ -490,28 +490,37 @@ public class RobotContainer {
   }
 
   public Command intakeAlgae() {
-    if (!intake.hasCoral() && !intake.hasAlgae() && !intake.maybeHasCoral()) {
-      return Commands.parallel(
-          logMessage("Intaking Algae"),
-          Commands.runOnce(() -> currentRobotState = States.INTAKING_ALGAE),
-          arm.changeSetpoint(ArmStates.INTAKE_ALGAE),
-          elevator.changeSetpoint(ElevatorStates.INTAKE),
-          wrist.changeSetpoint(WristStates.INTAKE),
-          grabAlgae());
-    } else {
-      return homeRobot();
-    }
+    return Commands.sequence(
+            logMessage("Intaking Algae"),
+            Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_ALGAE)),
+            Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
+            Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)),
+            Commands.runOnce(() -> currentRobotState = States.INTAKING_ALGAE),
+            grabAlgae())
+        .onlyIf(() -> !intake.hasAlgae());
+
+    // if (!intake.hasCoral() && !intake.hasAlgae() && !intake.maybeHasCoral()) {
+    //   return Commands.parallel(
+    //       logMessage("Intaking Algae"),
+    //       Commands.runOnce(() -> currentRobotState = States.INTAKING_ALGAE),
+    //       arm.changeSetpoint(ArmStates.INTAKE_ALGAE),
+    //       elevator.changeSetpoint(ElevatorStates.INTAKE),
+    //       wrist.changeSetpoint(WristStates.INTAKE),
+    //       grabAlgae());
+    // } else {
+    //   return homeRobot();
+    // }
   }
 
   public Command grabAlgae() {
     return Commands.sequence(
-        intake.changeSetpoint(IntakeStates.INTAKE),
+        Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.INTAKE)),
         Commands.waitUntil(() -> intake.hasAlgae()),
         prepAlgae());
   }
 
   public Command prepAlgae() {
-    return Commands.parallel(
+    return Commands.sequence(
         logMessage("Prepping Algae"),
         Commands.runOnce(() -> currentRobotState = States.HOLDING_ALGAE),
         Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.HOLD)),
