@@ -12,7 +12,7 @@ public enum ElevatorStates {
   // | Reef
   PREP_L2(3, "Prepping L2"),
   PREP_L3(18, "Prepping L3"),
-  PREP_l4(46, "Prepping L4"),
+  PREP_L4(46, "Prepping L4"),
 
   PLACE_L2(2, "Placing L2"),
   PLACE_L3(17, "Placing L3"),
