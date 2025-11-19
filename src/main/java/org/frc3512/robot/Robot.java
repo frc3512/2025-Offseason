@@ -84,6 +84,11 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
+  public void robotInit() {
+    robotContainer.logMessage("Robot initialized");
+  }
+
+  @Override
   public void robotPeriodic() {
     Threads.setCurrentThreadPriority(true, 99);
     CommandScheduler.getInstance().run();

@@ -209,20 +209,19 @@ public class RobotContainer {
                 () -> -controller.getLeftX() * TunerConstants.slowSpeed,
                 () -> -controller.getRightX() * TunerConstants.slowAngularRate));
 
-    // Prep
-    controller.b().onTrue(runBLogic());
-    controller.a().onTrue(runALogic());
-    controller.x().onTrue(runXLogic());
-    controller.y().onTrue(runYLogic());
+    // // Prep
+    // controller.b().onTrue(runBLogic());
+    // controller.a().onTrue(runALogic());
+    // controller.x().onTrue(runXLogic());
+    // controller.y().onTrue(runYLogic());
 
-    // Execute Action
-    controller.rightTrigger().onTrue(maybePlaceCoral()).onFalse(executeAction());
-
+    // // Execute Action
+    // controller.rightTrigger().onTrue(maybePlaceCoral()).onFalse(executeAction());
   }
 
   // * Home
   public Command homeRobot() {
-    return Commands.sequence(
+    return Commands.parallel(
         // Reset all mechanisms to stow positions
         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.STOW)),
         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.STOW)),
@@ -260,22 +259,31 @@ public class RobotContainer {
   }
 
   public Command intakeCoral() {
-    if (!intake.hasCoral() && !intake.maybeHasCoral()) {
-      return Commands.sequence(
-          logMessage("Intaking Coral"),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_CORAL)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)),
-          Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
-          grabCoral());
-    } else {
-      return homeRobot();
-    }
+    return Commands.parallel(
+            logMessage("Intaking Coral"),
+            arm.changeSetpoint(ArmStates.INTAKE_CORAL),
+            elevator.changeSetpoint(ElevatorStates.INTAKE),
+            wrist.changeSetpoint(WristStates.INTAKE),
+            Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
+            grabCoral())
+        .onlyIf(() -> !intake.hasCoral() || !intake.maybeHasCoral());
+
+    // if (!intake.hasCoral() && !intake.maybeHasCoral()) {
+    //   return Commands.sequence(
+    //       logMessage("Intaking Coral"),
+    //       Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_CORAL)),
+    //       Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
+    //       Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)),
+    //       Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
+    //       grabCoral());
+    // } else {
+    //   return homeRobot();
+    // }
   }
 
   public Command grabCoral() {
     return Commands.sequence(
-        Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.INTAKE)),
+        intake.changeSetpoint(IntakeStates.INTAKE),
         Commands.waitUntil(() -> intake.hasCoral() || intake.maybeHasCoral()),
         prepCoral());
   }
@@ -284,193 +292,193 @@ public class RobotContainer {
     return Commands.parallel(
         logMessage("Prepping Coral"),
         Commands.runOnce(() -> currentRobotState = States.PREPPING_CORAL),
-        Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.STOPPED)),
-        Commands.runOnce(() -> arm.changeSetpoint(ArmStates.HOLD_CORAL)),
-        Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_CORAL)),
-        Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)));
+        intake.changeSetpoint(IntakeStates.STOPPED),
+        arm.changeSetpoint(ArmStates.HOLD_CORAL),
+        elevator.changeSetpoint(ElevatorStates.PREP_CORAL),
+        wrist.changeSetpoint(WristStates.CORAL));
   }
 
-  public Command prepTrough() {
-    if (intake.maybeHasCoral() || intake.hasCoral()) {
-      return Commands.parallel(
-          logMessage("Prepping Trough"),
-          Commands.runOnce(() -> currentRobotState = States.PREPPING_TROUGH),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.TROUGH)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.TROUGH)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.TROUGH)),
-          Commands.runOnce(() -> wantedLevel = scoringLevels.L1),
-          Commands.runOnce(() -> coralReady = true));
-    } else {
-      return homeRobot();
-    }
-  }
+  // public Command prepTrough() {
+  //   if (intake.maybeHasCoral() || intake.hasCoral()) {
+  //     return Commands.parallel(
+  //         logMessage("Prepping Trough"),
+  //         Commands.runOnce(() -> currentRobotState = States.PREPPING_TROUGH),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.TROUGH)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.TROUGH)),
+  //         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.TROUGH)),
+  //         Commands.runOnce(() -> wantedLevel = scoringLevels.L1),
+  //         Commands.runOnce(() -> coralReady = true));
+  //   } else {
+  //     return homeRobot();
+  //   }
+  // }
 
-  public Command prepL2() {
-    if (intake.maybeHasCoral() || intake.hasCoral()) {
-      return Commands.parallel(
-          logMessage("Prepping L2"),
-          Commands.runOnce(() -> currentRobotState = States.PREPPING_L2),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_MID)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_L2)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)),
-          Commands.runOnce(() -> wantedLevel = scoringLevels.L2),
-          Commands.runOnce(() -> coralReady = true));
-    } else {
-      return homeRobot();
-    }
-  }
+  // public Command prepL2() {
+  //   if (intake.maybeHasCoral() || intake.hasCoral()) {
+  //     return Commands.parallel(
+  //         logMessage("Prepping L2"),
+  //         Commands.runOnce(() -> currentRobotState = States.PREPPING_L2),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_MID)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_L2)),
+  //         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)),
+  //         Commands.runOnce(() -> wantedLevel = scoringLevels.L2),
+  //         Commands.runOnce(() -> coralReady = true));
+  //   } else {
+  //     return homeRobot();
+  //   }
+  // }
 
-  public Command prepL3() {
-    if (intake.maybeHasCoral() || intake.hasCoral()) {
-      return Commands.parallel(
-          logMessage("Prepping L3"),
-          Commands.runOnce(() -> currentRobotState = States.PREPPING_L3),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_MID)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_L3)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)),
-          Commands.runOnce(() -> wantedLevel = scoringLevels.L3),
-          Commands.runOnce(() -> coralReady = true));
-    } else {
-      return homeRobot();
-    }
-  }
+  // public Command prepL3() {
+  //   if (intake.maybeHasCoral() || intake.hasCoral()) {
+  //     return Commands.parallel(
+  //         logMessage("Prepping L3"),
+  //         Commands.runOnce(() -> currentRobotState = States.PREPPING_L3),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_MID)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_L3)),
+  //         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)),
+  //         Commands.runOnce(() -> wantedLevel = scoringLevels.L3),
+  //         Commands.runOnce(() -> coralReady = true));
+  //   } else {
+  //     return homeRobot();
+  //   }
+  // }
 
-  public Command prepL4() {
-    if (intake.maybeHasCoral() || intake.hasCoral()) {
-      return Commands.parallel(
-          logMessage("Prepping L4"),
-          Commands.runOnce(() -> currentRobotState = States.PREPPING_L4),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_L4)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_l4)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)),
-          Commands.runOnce(() -> wantedLevel = scoringLevels.L4),
-          Commands.runOnce(() -> coralReady = true));
-    } else {
-      return homeRobot();
-    }
-  }
+  // public Command prepL4() {
+  //   if (intake.maybeHasCoral() || intake.hasCoral()) {
+  //     return Commands.parallel(
+  //         logMessage("Prepping L4"),
+  //         Commands.runOnce(() -> currentRobotState = States.PREPPING_L4),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PREP_L4)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_l4)),
+  //         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)),
+  //         Commands.runOnce(() -> wantedLevel = scoringLevels.L4),
+  //         Commands.runOnce(() -> coralReady = true));
+  //   } else {
+  //     return homeRobot();
+  //   }
+  // }
 
-  public Command placeTrough() {
-    if (coralReady) {
-      return Commands.sequence(
-          logMessage("Placing in Trough"),
-          Commands.runOnce(() -> currentRobotState = States.PLACING_TROUGH),
-          Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.SPIT)),
-          Commands.waitSeconds(0.5),
-          homeRobot());
-    } else {
-      return prepCoral();
-    }
-  }
+  // public Command placeTrough() {
+  //   if (coralReady) {
+  //     return Commands.sequence(
+  //         logMessage("Placing in Trough"),
+  //         Commands.runOnce(() -> currentRobotState = States.PLACING_TROUGH),
+  //         Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.SPIT)),
+  //         Commands.waitSeconds(0.5),
+  //         homeRobot());
+  //   } else {
+  //     return prepCoral();
+  //   }
+  // }
 
-  public Command placeL2() {
-    if (coralReady) {
-      return Commands.parallel(
-          logMessage("Placing L2"),
-          Commands.runOnce(() -> currentRobotState = States.PLACING_L2),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_MID)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PLACE_L2)));
-    } else {
-      return prepCoral();
-    }
-  }
+  // public Command placeL2() {
+  //   if (coralReady) {
+  //     return Commands.parallel(
+  //         logMessage("Placing L2"),
+  //         Commands.runOnce(() -> currentRobotState = States.PLACING_L2),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_MID)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PLACE_L2)));
+  //   } else {
+  //     return prepCoral();
+  //   }
+  // }
 
-  public Command placeL3() {
-    if (coralReady) {
-      return Commands.parallel(
-          logMessage("Placing L3"),
-          Commands.runOnce(() -> currentRobotState = States.PLACING_L3),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_MID)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PLACE_L3)));
-    } else {
-      return prepCoral();
-    }
-  }
+  // public Command placeL3() {
+  //   if (coralReady) {
+  //     return Commands.parallel(
+  //         logMessage("Placing L3"),
+  //         Commands.runOnce(() -> currentRobotState = States.PLACING_L3),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_MID)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PLACE_L3)));
+  //   } else {
+  //     return prepCoral();
+  //   }
+  // }
 
-  public Command placeL4() {
-    if (coralReady) {
-      return Commands.parallel(
-          logMessage("Placing L4"),
-          Commands.runOnce(() -> currentRobotState = States.PLACING_L4),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_L4)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PLACE_L4)));
-    } else {
-      return prepCoral();
-    }
-  }
+  // public Command placeL4() {
+  //   if (coralReady) {
+  //     return Commands.parallel(
+  //         logMessage("Placing L4"),
+  //         Commands.runOnce(() -> currentRobotState = States.PLACING_L4),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PLACE_L4)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PLACE_L4)));
+  //   } else {
+  //     return prepCoral();
+  //   }
+  // }
 
-  public Command releaseCoral() {
-    if (coralReady) {
-      return Commands.sequence(
-          logMessage("Releasing Coral"),
-          Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.PLACE)),
-          Commands.waitSeconds(0.5),
-          homeRobot());
-    } else {
-      return prepCoral();
-    }
-  }
+  // public Command releaseCoral() {
+  //   if (coralReady) {
+  //     return Commands.sequence(
+  //         logMessage("Releasing Coral"),
+  //         Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.PLACE)),
+  //         Commands.waitSeconds(0.5),
+  //         homeRobot());
+  //   } else {
+  //     return prepCoral();
+  //   }
+  // }
 
-  // we have a maybe since l1 requires no spear on the node,
-  // so it will remain prepped in this instance
-  public Command maybePlaceCoral() {
-    if (currentMode == driverMode.CORAL) {
-      if (coralReady) {
-        switch (wantedLevel) {
-          case L1:
-            return doNothing();
+  // // we have a maybe since l1 requires no spear on the node,
+  // // so it will remain prepped in this instance
+  // public Command maybePlaceCoral() {
+  //   if (currentMode == driverMode.CORAL) {
+  //     if (coralReady) {
+  //       switch (wantedLevel) {
+  //         case L1:
+  //           return doNothing();
 
-          case L2:
-            return placeL2();
+  //         case L2:
+  //           return placeL2();
 
-          case L3:
-            return placeL3();
+  //         case L3:
+  //           return placeL3();
 
-          case L4:
-            return placeL4();
+  //         case L4:
+  //           return placeL4();
 
-          case NONE:
-            return prepCoral();
+  //         case NONE:
+  //           return prepCoral();
 
-          default:
-            return doNothing();
-        }
-      } else {
-        return prepCoral();
-      }
-    } else {
-      return doNothing();
-    }
-  }
+  //         default:
+  //           return doNothing();
+  //       }
+  //     } else {
+  //       return prepCoral();
+  //     }
+  //   } else {
+  //     return doNothing();
+  //   }
+  // }
 
-  // execute the action to score coral based on wanted level
-  public Command executeCoralAction() {
-    if (coralReady) {
-      switch (wantedLevel) {
-        case L1:
-          return placeTrough();
+  // // execute the action to score coral based on wanted level
+  // public Command executeCoralAction() {
+  //   if (coralReady) {
+  //     switch (wantedLevel) {
+  //       case L1:
+  //         return placeTrough();
 
-        case L2:
-          return releaseCoral();
+  //       case L2:
+  //         return releaseCoral();
 
-        case L3:
-          return releaseCoral();
+  //       case L3:
+  //         return releaseCoral();
 
-        case L4:
-          return releaseCoral();
+  //       case L4:
+  //         return releaseCoral();
 
-        default:
-          return homeRobot();
-      }
-    } else {
-      return prepCoral();
-    }
-  }
+  //       default:
+  //         return homeRobot();
+  //     }
+  //   } else {
+  //     return prepCoral();
+  //   }
+  // }
 
-  // * ------ BEGIN ALGAE MODE ------
+  // // * ------ BEGIN ALGAE MODE ------
 
   public Command setAlgaeMode() {
-    return Commands.sequence(
+    return Commands.parallel(
         // Set mode
         Commands.runOnce(() -> currentMode = driverMode.ALGAE),
         // Log mode switch
@@ -486,9 +494,9 @@ public class RobotContainer {
       return Commands.parallel(
           logMessage("Intaking Algae"),
           Commands.runOnce(() -> currentRobotState = States.INTAKING_ALGAE),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_ALGAE)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)),
+          arm.changeSetpoint(ArmStates.INTAKE_ALGAE),
+          elevator.changeSetpoint(ElevatorStates.INTAKE),
+          wrist.changeSetpoint(WristStates.INTAKE),
           grabAlgae());
     } else {
       return homeRobot();
@@ -497,7 +505,7 @@ public class RobotContainer {
 
   public Command grabAlgae() {
     return Commands.sequence(
-        Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.INTAKE)),
+        intake.changeSetpoint(IntakeStates.INTAKE),
         Commands.waitUntil(() -> intake.hasAlgae()),
         prepAlgae());
   }
@@ -512,87 +520,87 @@ public class RobotContainer {
         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.ALGAE)));
   }
 
-  public Command prepProcess() {
-    if (intake.hasAlgae()) {
-      return Commands.parallel(
-          logMessage("Prepping Processor"),
-          Commands.runOnce(() -> currentRobotState = States.PREPPING_PROCESSOR),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PROCESS)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PROCESSOR)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.PROCESS)),
-          Commands.runOnce(() -> processorReady = true));
-    } else {
-      return prepAlgae();
-    }
-  }
+  // public Command prepProcess() {
+  //   if (intake.hasAlgae()) {
+  //     return Commands.parallel(
+  //         logMessage("Prepping Processor"),
+  //         Commands.runOnce(() -> currentRobotState = States.PREPPING_PROCESSOR),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.PROCESS)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PROCESSOR)),
+  //         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.PROCESS)),
+  //         Commands.runOnce(() -> processorReady = true));
+  //   } else {
+  //     return prepAlgae();
+  //   }
+  // }
 
-  public Command prepBarge() {
-    if (intake.hasAlgae()) {
-      return Commands.parallel(
-          logMessage("Prepping Barge"),
-          Commands.runOnce(() -> currentRobotState = States.PREPPING_BARGE),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.BARGE)),
-          Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.BARGE)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.ALGAE)),
-          Commands.runOnce(() -> bargeReady = true));
-    } else {
-      return prepAlgae();
-    }
-  }
+  // public Command prepBarge() {
+  //   if (intake.hasAlgae()) {
+  //     return Commands.parallel(
+  //         logMessage("Prepping Barge"),
+  //         Commands.runOnce(() -> currentRobotState = States.PREPPING_BARGE),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.BARGE)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.BARGE)),
+  //         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.ALGAE)),
+  //         Commands.runOnce(() -> bargeReady = true));
+  //   } else {
+  //     return prepAlgae();
+  //   }
+  // }
 
-  public Command process() {
-    if (processorReady) {
-      return Commands.sequence(
-          logMessage("Processing Algae"),
-          Commands.runOnce(() -> currentRobotState = States.EJECTING),
-          Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.EJECT)),
-          Commands.waitSeconds(0.5),
-          homeRobot());
-    } else {
-      return prepAlgae();
-    }
-  }
+  // public Command process() {
+  //   if (processorReady) {
+  //     return Commands.sequence(
+  //         logMessage("Processing Algae"),
+  //         Commands.runOnce(() -> currentRobotState = States.EJECTING),
+  //         Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.EJECT)),
+  //         Commands.waitSeconds(0.5),
+  //         homeRobot());
+  //   } else {
+  //     return prepAlgae();
+  //   }
+  // }
 
-  public Command placeBarge() {
-    if (bargeReady) {
-      return Commands.sequence(
-          logMessage("Placing in Barge"),
-          Commands.runOnce(() -> currentRobotState = States.EJECTING),
-          Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.EJECT)),
-          Commands.waitSeconds(0.5),
-          homeRobot());
-    } else {
-      return prepAlgae();
-    }
-  }
+  // public Command placeBarge() {
+  //   if (bargeReady) {
+  //     return Commands.sequence(
+  //         logMessage("Placing in Barge"),
+  //         Commands.runOnce(() -> currentRobotState = States.EJECTING),
+  //         Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.EJECT)),
+  //         Commands.waitSeconds(0.5),
+  //         homeRobot());
+  //   } else {
+  //     return prepAlgae();
+  //   }
+  // }
 
-  public Command grabAlgaeReef(ElevatorStates level) {
-    if (!intake.hasAlgae()) {
-      return Commands.parallel(
-          logMessage("Grabbing Algae from Reef"),
-          checkAlgaeLevel(level),
-          grabAlgae(),
-          Commands.runOnce(() -> arm.changeSetpoint(ArmStates.REMOVE_ALGAE)),
-          Commands.runOnce(() -> elevator.changeSetpoint(level)),
-          Commands.runOnce(() -> wrist.changeSetpoint(WristStates.ALGAE)));
-    } else {
-      return prepAlgae();
-    }
-  }
+  // public Command grabAlgaeReef(ElevatorStates level) {
+  //   if (!intake.hasAlgae()) {
+  //     return Commands.parallel(
+  //         logMessage("Grabbing Algae from Reef"),
+  //         checkAlgaeLevel(level),
+  //         grabAlgae(),
+  //         Commands.runOnce(() -> arm.changeSetpoint(ArmStates.REMOVE_ALGAE)),
+  //         Commands.runOnce(() -> elevator.changeSetpoint(level)),
+  //         Commands.runOnce(() -> wrist.changeSetpoint(WristStates.ALGAE)));
+  //   } else {
+  //     return prepAlgae();
+  //   }
+  // }
 
-  public Command executeAlgaeAction() {
-    if (currentMode == driverMode.ALGAE) {
-      if (processorReady) {
-        return process();
-      } else if (bargeReady) {
-        return placeBarge();
-      } else {
-        return prepAlgae();
-      }
-    } else {
-      return doNothing();
-    }
-  }
+  // public Command executeAlgaeAction() {
+  //   if (currentMode == driverMode.ALGAE) {
+  //     if (processorReady) {
+  //       return process();
+  //     } else if (bargeReady) {
+  //       return placeBarge();
+  //     } else {
+  //       return prepAlgae();
+  //     }
+  //   } else {
+  //     return doNothing();
+  //   }
+  // }
 
   // * ------ BEGIN DOUBLE BINDING LOGIC ------
 
@@ -600,28 +608,28 @@ public class RobotContainer {
     return Commands.either(intakeCoral(), intakeAlgae(), () -> currentMode == driverMode.CORAL);
   }
 
-  public Command runBLogic() {
-    return Commands.either(prepTrough(), prepProcess(), () -> currentMode == driverMode.CORAL);
-  }
+  // public Command runBLogic() {
+  //   return Commands.either(prepTrough(), prepProcess(), () -> currentMode == driverMode.CORAL);
+  // }
 
-  public Command runALogic() {
-    return Commands.either(
-        prepL2(), grabAlgaeReef(ElevatorStates.ALGAE_L1), () -> currentMode == driverMode.CORAL);
-  }
+  // public Command runALogic() {
+  //   return Commands.either(
+  //       prepL2(), grabAlgaeReef(ElevatorStates.ALGAE_L1), () -> currentMode == driverMode.CORAL);
+  // }
 
-  public Command runXLogic() {
-    return Commands.either(prepL3(), prepBarge(), () -> currentMode == driverMode.CORAL);
-  }
+  // public Command runXLogic() {
+  //   return Commands.either(prepL3(), prepBarge(), () -> currentMode == driverMode.CORAL);
+  // }
 
-  public Command runYLogic() {
-    return Commands.either(
-        prepL4(), grabAlgaeReef(ElevatorStates.ALGAE_L2), () -> currentMode == driverMode.CORAL);
-  }
+  // public Command runYLogic() {
+  //   return Commands.either(
+  //       prepL4(), grabAlgaeReef(ElevatorStates.ALGAE_L2), () -> currentMode == driverMode.CORAL);
+  // }
 
-  public Command executeAction() {
-    return Commands.either(
-        executeCoralAction(), executeAlgaeAction(), () -> currentMode == driverMode.CORAL);
-  }
+  // public Command executeAction() {
+  //   return Commands.either(
+  //       executeCoralAction(), executeAlgaeAction(), () -> currentMode == driverMode.CORAL);
+  // }
 
   // * ------ EXCESS LOGIC ------
 
@@ -646,5 +654,4 @@ public class RobotContainer {
       return doNothing();
     }
   }
-
 }
