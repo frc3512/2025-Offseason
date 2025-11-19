@@ -1,5 +1,13 @@
 package org.frc3512.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import org.frc3512.robot.commands.DriveCommands;
 import org.frc3512.robot.constants.Constants.GeneralConstants;
 import org.frc3512.robot.constants.TunerConstants;
@@ -31,15 +39,6 @@ import org.frc3512.robot.subsystems.wrist.WristIOTalonFX;
 import org.frc3512.robot.subsystems.wrist.WristStates;
 import org.frc3512.robot.superstructure.States;
 import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
 
@@ -266,170 +265,163 @@ public class RobotContainer {
   // intake command (automatic)
   public Command intakeCoral() {
     return Commands.sequence(
-      // auto intake coral
-      logMessage("Intaking Coral"),
-      Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
-      arm.changeSetpoint(ArmStates.INTAKE_CORAL),
-      elevator.changeSetpoint(ElevatorStates.INTAKE),
-      wrist.changeSetpoint(WristStates.INTAKE),
-      intake.changeSetpoint(IntakeStates.INTAKE),
-      Commands.waitUntil(() -> haveCoral()),
-      // prep once we have a coral
-      prepCoral());
+        // auto intake coral
+        logMessage("Intaking Coral"),
+        Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
+        arm.changeSetpoint(ArmStates.INTAKE_CORAL),
+        elevator.changeSetpoint(ElevatorStates.INTAKE),
+        wrist.changeSetpoint(WristStates.INTAKE),
+        intake.changeSetpoint(IntakeStates.INTAKE),
+        Commands.waitUntil(() -> haveCoral()),
+        // prep once we have a coral
+        prepCoral());
   }
 
   // prep coral
   public Command prepCoral() {
     return Commands.sequence(
-      logMessage("Prepping Coral"),
-      Commands.runOnce(() -> currentRobotState = States.PREPPING_CORAL),
-      intake.changeSetpoint(IntakeStates.STOPPED),
-      arm.changeSetpoint(ArmStates.HOLD_CORAL),
-      elevator.changeSetpoint(ElevatorStates.PREP_CORAL),
-      wrist.changeSetpoint(WristStates.CORAL));
+        logMessage("Prepping Coral"),
+        Commands.runOnce(() -> currentRobotState = States.PREPPING_CORAL),
+        intake.changeSetpoint(IntakeStates.STOPPED),
+        arm.changeSetpoint(ArmStates.HOLD_CORAL),
+        elevator.changeSetpoint(ElevatorStates.PREP_CORAL),
+        wrist.changeSetpoint(WristStates.CORAL));
   }
 
   public Command prepTrough() {
     return Commands.sequence(
-      logMessage("Prepping Trough"),
-      Commands.runOnce(() -> currentRobotState = States.PREPPING_TROUGH),
-      Commands.runOnce(() -> wantedLevel = scoringLevels.L1),
-      // update to trough prep positions
-      arm.changeSetpoint(ArmStates.TROUGH),
-      elevator.changeSetpoint(ElevatorStates.TROUGH),
-      wrist.changeSetpoint(WristStates.TROUGH),
-      // wait until at setpoints
-      Commands.waitUntil(() -> arm.atSetpoint()),
-      Commands.waitUntil(() -> elevator.atSetpoint()),
-      // update readiness
-      Commands.runOnce(() -> coralReady = true))
-    .onlyIf(() -> haveCoral());
+            logMessage("Prepping Trough"),
+            Commands.runOnce(() -> currentRobotState = States.PREPPING_TROUGH),
+            Commands.runOnce(() -> wantedLevel = scoringLevels.L1),
+            // update to trough prep positions
+            arm.changeSetpoint(ArmStates.TROUGH),
+            elevator.changeSetpoint(ElevatorStates.TROUGH),
+            wrist.changeSetpoint(WristStates.TROUGH),
+            // wait until at setpoints
+            Commands.waitUntil(() -> arm.atSetpoint()),
+            Commands.waitUntil(() -> elevator.atSetpoint()),
+            // update readiness
+            Commands.runOnce(() -> coralReady = true))
+        .onlyIf(() -> haveCoral());
   }
 
   public Command prepL2() {
     return Commands.sequence(
-      logMessage("Prepping L2"),
-      Commands.runOnce(() -> currentRobotState = States.PREPPING_L2),
-      Commands.runOnce(() -> wantedLevel = scoringLevels.L2),
-      // update to L2 prep positions
-      arm.changeSetpoint(ArmStates.PREP_MID),
-      elevator.changeSetpoint(ElevatorStates.PREP_L2),
-      wrist.changeSetpoint(WristStates.CORAL),
-      // wait until at setpoints
-      Commands.waitUntil(() -> arm.atSetpoint()),
-      Commands.waitUntil(() -> elevator.atSetpoint()),
-      // update readiness
-      Commands.runOnce(() -> coralReady = true))
-    .onlyIf(() -> haveCoral());
+            logMessage("Prepping L2"),
+            Commands.runOnce(() -> currentRobotState = States.PREPPING_L2),
+            Commands.runOnce(() -> wantedLevel = scoringLevels.L2),
+            // update to L2 prep positions
+            arm.changeSetpoint(ArmStates.PREP_MID),
+            elevator.changeSetpoint(ElevatorStates.PREP_L2),
+            wrist.changeSetpoint(WristStates.CORAL),
+            // wait until at setpoints
+            Commands.waitUntil(() -> arm.atSetpoint()),
+            Commands.waitUntil(() -> elevator.atSetpoint()),
+            // update readiness
+            Commands.runOnce(() -> coralReady = true))
+        .onlyIf(() -> haveCoral());
   }
 
   public Command prepL3() {
     return Commands.sequence(
-      logMessage("Prepping L3"),
-      Commands.runOnce(() -> currentRobotState = States.PREPPING_L3),
-      Commands.runOnce(() -> wantedLevel = scoringLevels.L3),
-      // update to L3 prep positions
-      arm.changeSetpoint(ArmStates.PREP_MID),
-      elevator.changeSetpoint(ElevatorStates.PREP_L3),
-      wrist.changeSetpoint(WristStates.CORAL),
-      // wait until at setpoints
-      Commands.waitUntil(() -> arm.atSetpoint()),
-      Commands.waitUntil(() -> elevator.atSetpoint()),
-      // update readiness
-      Commands.runOnce(() -> coralReady = true))
-    .onlyIf(() -> haveCoral());
+            logMessage("Prepping L3"),
+            Commands.runOnce(() -> currentRobotState = States.PREPPING_L3),
+            Commands.runOnce(() -> wantedLevel = scoringLevels.L3),
+            // update to L3 prep positions
+            arm.changeSetpoint(ArmStates.PREP_MID),
+            elevator.changeSetpoint(ElevatorStates.PREP_L3),
+            wrist.changeSetpoint(WristStates.CORAL),
+            // wait until at setpoints
+            Commands.waitUntil(() -> arm.atSetpoint()),
+            Commands.waitUntil(() -> elevator.atSetpoint()),
+            // update readiness
+            Commands.runOnce(() -> coralReady = true))
+        .onlyIf(() -> haveCoral());
   }
 
   public Command prepL4() {
     return Commands.sequence(
-      logMessage("Prepping L4"),
-      Commands.runOnce(() -> currentRobotState = States.PREPPING_L4),
-      Commands.runOnce(() -> wantedLevel = scoringLevels.L4),
-      // update to L4 prep positions
-      arm.changeSetpoint(ArmStates.PREP_L4),
-      elevator.changeSetpoint(ElevatorStates.PREP_L4),
-      wrist.changeSetpoint(WristStates.CORAL),
-      // wait until at setpoints
-      Commands.waitUntil(() -> arm.atSetpoint()),
-      Commands.waitUntil(() -> elevator.atSetpoint()),
-      // update readiness
-      Commands.runOnce(() -> coralReady = true))
-    .onlyIf(() -> haveCoral());
+            logMessage("Prepping L4"),
+            Commands.runOnce(() -> currentRobotState = States.PREPPING_L4),
+            Commands.runOnce(() -> wantedLevel = scoringLevels.L4),
+            // update to L4 prep positions
+            arm.changeSetpoint(ArmStates.PREP_L4),
+            elevator.changeSetpoint(ElevatorStates.PREP_L4),
+            wrist.changeSetpoint(WristStates.CORAL),
+            // wait until at setpoints
+            Commands.waitUntil(() -> arm.atSetpoint()),
+            Commands.waitUntil(() -> elevator.atSetpoint()),
+            // update readiness
+            Commands.runOnce(() -> coralReady = true))
+        .onlyIf(() -> haveCoral());
   }
 
   public Command placeTrough() {
     return Commands.either(
-      // Place coral if ready
-      Commands.sequence(
-        logMessage("Placing Trough"),
-        Commands.runOnce(() -> currentRobotState = States.PLACING_TROUGH),
-        intake.changeSetpoint(IntakeStates.SPIT),
-        Commands.waitSeconds(0.5),
-        homeRobot()
-      ),
-      // Prep coral if not ready
-      prepCoral(),
-      // Boolean check
-      () -> coralReady);
+        // Place coral if ready
+        Commands.sequence(
+            logMessage("Placing Trough"),
+            Commands.runOnce(() -> currentRobotState = States.PLACING_TROUGH),
+            intake.changeSetpoint(IntakeStates.SPIT),
+            Commands.waitSeconds(0.5),
+            homeRobot()),
+        // Prep coral if not ready
+        prepCoral(),
+        // Boolean check
+        () -> coralReady);
   }
 
   // * spearing logic applies to all levels above l1
 
   public Command placeL2() {
     return Commands.either(
-      // Spear coral if ready
-      Commands.sequence(
-        logMessage("Placing L2"),
-        Commands.runOnce(() -> currentRobotState = States.PLACING_L2),
-        arm.changeSetpoint(ArmStates.PLACE_MID),
-        elevator.changeSetpoint(ElevatorStates.PLACE_L2)
-      ),
-      // Prep coral if not ready
-      prepCoral(),
-      // Boolean check
-      () -> coralReady);
+        // Spear coral if ready
+        Commands.sequence(
+            logMessage("Placing L2"),
+            Commands.runOnce(() -> currentRobotState = States.PLACING_L2),
+            arm.changeSetpoint(ArmStates.PLACE_MID),
+            elevator.changeSetpoint(ElevatorStates.PLACE_L2)),
+        // Prep coral if not ready
+        prepCoral(),
+        // Boolean check
+        () -> coralReady);
   }
 
   public Command placeL3() {
     return Commands.either(
-      Commands.sequence(
-        logMessage("Placing L3"),
-        Commands.runOnce(() -> currentRobotState = States.PLACING_L3),
-        arm.changeSetpoint(ArmStates.PLACE_MID),
-        elevator.changeSetpoint(ElevatorStates.PLACE_L3)
-      ),
-      prepCoral(), 
-      () -> coralReady);
+        Commands.sequence(
+            logMessage("Placing L3"),
+            Commands.runOnce(() -> currentRobotState = States.PLACING_L3),
+            arm.changeSetpoint(ArmStates.PLACE_MID),
+            elevator.changeSetpoint(ElevatorStates.PLACE_L3)),
+        prepCoral(),
+        () -> coralReady);
   }
 
   public Command placeL4() {
     return Commands.either(
-      Commands.sequence(
-        logMessage("Placing L4"),
-        Commands.runOnce(() -> currentRobotState = States.PLACING_L4),
-        arm.changeSetpoint(ArmStates.PLACE_L4),
-        elevator.changeSetpoint(ElevatorStates.PLACE_L4)
-      ),
-      prepCoral(),
-      () -> coralReady);
+        Commands.sequence(
+            logMessage("Placing L4"),
+            Commands.runOnce(() -> currentRobotState = States.PLACING_L4),
+            arm.changeSetpoint(ArmStates.PLACE_L4),
+            elevator.changeSetpoint(ElevatorStates.PLACE_L4)),
+        prepCoral(),
+        () -> coralReady);
   }
 
   public Command releaseCoral() {
     // No need for logic as we cannot get here without having already prepped a coral
     return Commands.sequence(
-      logMessage("Releasing Coral"),
-      intake.changeSetpoint(IntakeStates.PLACE),
-      Commands.waitSeconds(0.5),
-      homeRobot());
+        logMessage("Releasing Coral"),
+        intake.changeSetpoint(IntakeStates.PLACE),
+        Commands.waitSeconds(0.5),
+        homeRobot());
   }
 
   // we have a maybe since l1 requires no spear on the node,
   // so it will remain prepped in this instance
   public Command maybePlaceCoral() {
-    return Commands.either(
-      placeCoral(), 
-      Commands.none(), 
-      () -> currentMode == driverMode.CORAL);
+    return Commands.either(placeCoral(), Commands.none(), () -> currentMode == driverMode.CORAL);
   }
 
   // execute the action to score coral based on wanted level
@@ -438,11 +430,7 @@ public class RobotContainer {
   }
 
   public Command placeCoral() {
-    return Commands.either(
-      placeLogic(),
-      prepCoral(),
-      () -> coralReady
-    );
+    return Commands.either(placeLogic(), prepCoral(), () -> coralReady);
   }
 
   public Command placeLogic() {
@@ -465,10 +453,7 @@ public class RobotContainer {
   }
 
   public Command scoreLogic() {
-    return Commands.either(
-      placeTrough(),
-      releaseCoral(),
-      () -> wantedLevel == scoringLevels.L1);
+    return Commands.either(placeTrough(), releaseCoral(), () -> wantedLevel == scoringLevels.L1);
   }
 
   // * ------ BEGIN ALGAE MODE ------
@@ -497,103 +482,98 @@ public class RobotContainer {
 
   public Command intakeAlgae() {
     return Commands.sequence(
-      logMessage("Intaking Algae"),
-      Commands.runOnce(() -> currentRobotState = States.INTAKING_ALGAE),
-      arm.changeSetpoint(ArmStates.INTAKE_ALGAE),
-      elevator.changeSetpoint(ElevatorStates.ALGAE_INTAKE),
-      wrist.changeSetpoint(WristStates.INTAKE),
-      intake.changeSetpoint(IntakeStates.INTAKE),
-      Commands.waitUntil(() -> haveAlgae()),
-      prepAlgae());
+        logMessage("Intaking Algae"),
+        Commands.runOnce(() -> currentRobotState = States.INTAKING_ALGAE),
+        arm.changeSetpoint(ArmStates.INTAKE_ALGAE),
+        elevator.changeSetpoint(ElevatorStates.ALGAE_INTAKE),
+        wrist.changeSetpoint(WristStates.INTAKE),
+        intake.changeSetpoint(IntakeStates.INTAKE),
+        Commands.waitUntil(() -> haveAlgae()),
+        prepAlgae());
   }
 
   public Command prepAlgae() {
     return Commands.sequence(
-      logMessage("Prepping Algae"),
-      Commands.runOnce(() -> currentRobotState = States.HOLDING_ALGAE),
-      intake.changeSetpoint(IntakeStates.HOLD),
-      arm.changeSetpoint(ArmStates.PREP_ALGAE),
-      elevator.changeSetpoint(ElevatorStates.PREP_ALGAE),
-      wrist.changeSetpoint(WristStates.ALGAE));
+        logMessage("Prepping Algae"),
+        Commands.runOnce(() -> currentRobotState = States.HOLDING_ALGAE),
+        intake.changeSetpoint(IntakeStates.HOLD),
+        arm.changeSetpoint(ArmStates.PREP_ALGAE),
+        elevator.changeSetpoint(ElevatorStates.PREP_ALGAE),
+        wrist.changeSetpoint(WristStates.ALGAE));
   }
 
   public Command prepProcess() {
     return Commands.sequence(
-        logMessage("Prepping Processor"),
-        Commands.runOnce(() -> currentRobotState = States.PREPPING_PROCESSOR),
-        // Update to process positions
-        arm.changeSetpoint(ArmStates.PROCESS),
-        elevator.changeSetpoint(ElevatorStates.PROCESSOR),
-        wrist.changeSetpoint(WristStates.PROCESS),
-        // Wait until at setpoints
-        Commands.waitUntil(() -> arm.atSetpoint()),
-        Commands.waitUntil(() -> elevator.atSetpoint()),
-        // update readiness
-        Commands.runOnce(() -> processorReady = true)
-      )
-    .onlyIf(() -> haveAlgae());
+            logMessage("Prepping Processor"),
+            Commands.runOnce(() -> currentRobotState = States.PREPPING_PROCESSOR),
+            // Update to process positions
+            arm.changeSetpoint(ArmStates.PROCESS),
+            elevator.changeSetpoint(ElevatorStates.PROCESSOR),
+            wrist.changeSetpoint(WristStates.PROCESS),
+            // Wait until at setpoints
+            Commands.waitUntil(() -> arm.atSetpoint()),
+            Commands.waitUntil(() -> elevator.atSetpoint()),
+            // update readiness
+            Commands.runOnce(() -> processorReady = true))
+        .onlyIf(() -> haveAlgae());
   }
 
   public Command prepBarge() {
     return Commands.sequence(
-        logMessage("Prepping Barge"),
-        Commands.runOnce(() -> currentRobotState = States.PREPPING_BARGE),
-        // Update to barge positions
-        arm.changeSetpoint(ArmStates.BARGE),
-        elevator.changeSetpoint(ElevatorStates.BARGE),
-        wrist.changeSetpoint(WristStates.ALGAE),
-        // Wait until at setpoints
-        Commands.waitUntil(() -> arm.atSetpoint()),
-        Commands.waitUntil(() -> elevator.atSetpoint()),
-        // update readiness
-        Commands.runOnce(() -> bargeReady = true)
-      )
-    .onlyIf(() -> haveAlgae());
+            logMessage("Prepping Barge"),
+            Commands.runOnce(() -> currentRobotState = States.PREPPING_BARGE),
+            // Update to barge positions
+            arm.changeSetpoint(ArmStates.BARGE),
+            elevator.changeSetpoint(ElevatorStates.BARGE),
+            wrist.changeSetpoint(WristStates.ALGAE),
+            // Wait until at setpoints
+            Commands.waitUntil(() -> arm.atSetpoint()),
+            Commands.waitUntil(() -> elevator.atSetpoint()),
+            // update readiness
+            Commands.runOnce(() -> bargeReady = true))
+        .onlyIf(() -> haveAlgae());
   }
 
   public Command process() {
     return Commands.sequence(
-      logMessage("Processing Algae"),
-      Commands.runOnce(() -> currentRobotState = States.EJECTING),
-      intake.changeSetpoint(IntakeStates.EJECT),
-      Commands.waitSeconds(0.5),
-      homeRobot())
-    .onlyIf(() -> haveAlgae() && processorReady);
+            logMessage("Processing Algae"),
+            Commands.runOnce(() -> currentRobotState = States.EJECTING),
+            intake.changeSetpoint(IntakeStates.EJECT),
+            Commands.waitSeconds(0.5),
+            homeRobot())
+        .onlyIf(() -> haveAlgae() && processorReady);
   }
 
   public Command placeBarge() {
     return Commands.sequence(
-      logMessage("Placing Algae in Barge"),
-      Commands.runOnce(() -> currentRobotState = States.EJECTING),
-      intake.changeSetpoint(IntakeStates.EJECT),
-      Commands.waitSeconds(0.5),
-      homeRobot())
-    .onlyIf(() -> haveAlgae() && bargeReady);
+            logMessage("Placing Algae in Barge"),
+            Commands.runOnce(() -> currentRobotState = States.EJECTING),
+            intake.changeSetpoint(IntakeStates.EJECT),
+            Commands.waitSeconds(0.5),
+            homeRobot())
+        .onlyIf(() -> haveAlgae() && bargeReady);
   }
 
   public Command grabAlgaeReef(ElevatorStates level) {
     return Commands.either(
-      Commands.sequence(
-        logMessage("Grabbing Algae from Reef"),
-        checkAlgaeLevel(level),
-        // begin intake process
-        intake.changeSetpoint(IntakeStates.INTAKE),
-        arm.changeSetpoint(ArmStates.REMOVE_ALGAE),
-        elevator.changeSetpoint(level),
-        wrist.changeSetpoint(WristStates.ALGAE),
-        // wait until we have algae
-        Commands.waitUntil(() -> haveAlgae()),
-        // prep algae once we have it
-        prepAlgae()),
-      prepAlgae(),
-      () -> haveAlgae());
+        Commands.sequence(
+            logMessage("Grabbing Algae from Reef"),
+            checkAlgaeLevel(level),
+            // begin intake process
+            intake.changeSetpoint(IntakeStates.INTAKE),
+            arm.changeSetpoint(ArmStates.REMOVE_ALGAE),
+            elevator.changeSetpoint(level),
+            wrist.changeSetpoint(WristStates.ALGAE),
+            // wait until we have algae
+            Commands.waitUntil(() -> haveAlgae()),
+            // prep algae once we have it
+            prepAlgae()),
+        prepAlgae(),
+        () -> haveAlgae());
   }
 
   public Command executeAlgaeAction() {
-    return Commands.either(
-      process(),
-      placeBarge(),
-      () -> processorReady);
+    return Commands.either(process(), placeBarge(), () -> processorReady);
   }
 
   // * ------ BEGIN DOUBLE BINDING LOGIC ------
