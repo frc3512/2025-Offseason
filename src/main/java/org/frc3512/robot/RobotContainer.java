@@ -254,32 +254,32 @@ public class RobotContainer {
   }
 
   public Command intakeCoral() {
-    // return Commands.either(
-    // Run full intake Sequence if no coral
-    return Commands.sequence(
-        logMessage("Intaking Coral"),
-        Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
-        Commands.runOnce(() -> arm.changeSetpoint(ArmStates.INTAKE_CORAL)),
-        Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.INTAKE)),
-        Commands.runOnce(() -> wrist.changeSetpoint(WristStates.INTAKE)),
-        Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.INTAKE)),
-        Commands.waitUntil(() -> intake.hasCoral() || intake.maybeHasCoral()),
-        logMessage("Prepping Coral"),
-        Commands.runOnce(() -> currentRobotState = States.PREPPING_CORAL),
-        Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.STOPPED)),
-        Commands.runOnce(() -> arm.changeSetpoint(ArmStates.HOLD_CORAL)),
-        Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_CORAL)),
-        Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL)));
+    return Commands.either(
+        // Run full intake Sequence if no coral
+        Commands.sequence(
+            logMessage("Intaking Coral"),
+            Commands.runOnce(() -> currentRobotState = States.INTAKING_CORAL),
+            arm.changeSetpoint(ArmStates.INTAKE_CORAL),
+            elevator.changeSetpoint(ElevatorStates.INTAKE),
+            wrist.changeSetpoint(WristStates.INTAKE),
+            intake.changeSetpoint(IntakeStates.INTAKE),
+            Commands.waitUntil(() -> intake.hasCoral() || intake.maybeHasCoral()),
+            logMessage("Prepping Coral"),
+            Commands.runOnce(() -> currentRobotState = States.PREPPING_CORAL),
+            intake.changeSetpoint(IntakeStates.STOPPED),
+            arm.changeSetpoint(ArmStates.HOLD_CORAL),
+            elevator.changeSetpoint(ElevatorStates.PREP_CORAL),
+            wrist.changeSetpoint(WristStates.CORAL)),
 
-    // // Only prep if has coral
-    // Commands.sequence(
-    //     logMessage("Prepping Coral"),
-    //     Commands.runOnce(() -> currentRobotState = States.PREPPING_CORAL),
-    //     Commands.runOnce(() -> intake.changeSetpoint(IntakeStates.STOPPED)),
-    //     Commands.runOnce(() -> arm.changeSetpoint(ArmStates.HOLD_CORAL)),
-    //     Commands.runOnce(() -> elevator.changeSetpoint(ElevatorStates.PREP_CORAL)),
-    //     Commands.runOnce(() -> wrist.changeSetpoint(WristStates.CORAL))),
-    // () -> !intake.hasCoral() || !intake.maybeHasCoral());
+        // Only prep if has coral
+        Commands.sequence(
+            logMessage("Prepping Coral"),
+            Commands.runOnce(() -> currentRobotState = States.PREPPING_CORAL),
+            intake.changeSetpoint(IntakeStates.STOPPED),
+            arm.changeSetpoint(ArmStates.HOLD_CORAL),
+            elevator.changeSetpoint(ElevatorStates.PREP_CORAL),
+            wrist.changeSetpoint(WristStates.CORAL)),
+        () -> !intake.hasCoral() || !intake.maybeHasCoral());
   }
 
   // public Command prepTrough() {
