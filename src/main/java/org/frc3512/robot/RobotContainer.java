@@ -161,6 +161,9 @@ public class RobotContainer {
     Logger.recordOutput("Robot States/Coral Ready", coralReady);
     Logger.recordOutput("Robot States/Barge Ready", bargeReady);
     Logger.recordOutput("Robot States/Processor Ready", processorReady);
+
+    Logger.recordOutput("Robot States/Have Coral", haveCoral());
+    Logger.recordOutput("Robot States/Have Algae", haveAlgae());
   }
 
   public void setBindings() {
@@ -195,7 +198,7 @@ public class RobotContainer {
     // Intake
     controller
         .leftTrigger()
-        .onTrue(intakeCoral())
+        .onTrue(runIntakeLogic())
         .whileTrue(
             DriveCommands.joystickDrive(
                 drive,
@@ -254,12 +257,12 @@ public class RobotContainer {
 
   public Command maybeIntakeCoral() {
     return Commands.either(
-        // Run full intake Sequence if no coral
-        intakeCoral(),
         // Only prep if has coral
         prepCoral(),
+        // Run full intake Sequence if no coral
+        intakeCoral(),
         // Logic for if we intake or not
-        () -> !haveCoral());
+        () -> haveCoral());
   }
 
   // intake command (automatic)
@@ -357,60 +360,46 @@ public class RobotContainer {
   }
 
   public Command placeTrough() {
-    return Commands.either(
-        // Place coral if ready
-        Commands.sequence(
+    return Commands.sequence(
             logMessage("Placing Trough"),
             Commands.runOnce(() -> currentRobotState = States.PLACING_TROUGH),
             intake.changeSetpoint(IntakeStates.SPIT),
             Commands.waitSeconds(0.5),
-            homeRobot()),
-        // Prep coral if not ready
-        prepCoral(),
-        // Boolean check
-        () -> coralReady);
+            homeRobot())
+        .onlyIf(() -> coralReady);
   }
 
   // * spearing logic applies to all levels above l1
 
   public Command placeL2() {
-    return Commands.either(
-        // Spear coral if ready
-        Commands.sequence(
+    return Commands.sequence(
             logMessage("Placing L2"),
             Commands.runOnce(() -> currentRobotState = States.PLACING_L2),
             arm.changeSetpoint(ArmStates.PLACE_MID),
-            elevator.changeSetpoint(ElevatorStates.PLACE_L2)),
-        // Prep coral if not ready
-        prepCoral(),
-        // Boolean check
-        () -> coralReady);
+            elevator.changeSetpoint(ElevatorStates.PLACE_L2))
+        .onlyIf(() -> coralReady);
   }
 
   public Command placeL3() {
-    return Commands.either(
-        Commands.sequence(
+    return Commands.sequence(
             logMessage("Placing L3"),
             Commands.runOnce(() -> currentRobotState = States.PLACING_L3),
             arm.changeSetpoint(ArmStates.PLACE_MID),
-            elevator.changeSetpoint(ElevatorStates.PLACE_L3)),
-        prepCoral(),
-        () -> coralReady);
+            elevator.changeSetpoint(ElevatorStates.PLACE_L3))
+        .onlyIf(() -> coralReady);
   }
 
   public Command placeL4() {
-    return Commands.either(
-        Commands.sequence(
+    return Commands.sequence(
             logMessage("Placing L4"),
             Commands.runOnce(() -> currentRobotState = States.PLACING_L4),
             arm.changeSetpoint(ArmStates.PLACE_L4),
-            elevator.changeSetpoint(ElevatorStates.PLACE_L4)),
-        prepCoral(),
-        () -> coralReady);
+            elevator.changeSetpoint(ElevatorStates.PLACE_L4))
+        .onlyIf(() -> coralReady);
   }
 
   public Command releaseCoral() {
-    // No need for logic as we cannot get here without having already prepped a coral
+    // No need for logic as we cannot get here without having already placed a coral
     return Commands.sequence(
         logMessage("Releasing Coral"),
         intake.changeSetpoint(IntakeStates.PLACE),
@@ -421,38 +410,20 @@ public class RobotContainer {
   // we have a maybe since l1 requires no spear on the node,
   // so it will remain prepped in this instance
   public Command maybePlaceCoral() {
-    return Commands.either(placeCoral(), Commands.none(), () -> currentMode == driverMode.CORAL);
+    return Commands.either(prepTrough(), placeBranch(), () -> wantedLevel == scoringLevels.L1)
+        .onlyIf(() -> currentMode == driverMode.CORAL && coralReady);
+  }
+
+  public Command placeBranch() {
+    return Commands.either(placeL4(), placeMid(), () -> wantedLevel == scoringLevels.L4);
+  }
+
+  public Command placeMid() {
+    return Commands.either(placeL2(), placeL3(), () -> wantedLevel == scoringLevels.L2);
   }
 
   // execute the action to score coral based on wanted level
   public Command executeCoralAction() {
-    return scoreLogic().onlyIf(() -> coralReady);
-  }
-
-  public Command placeCoral() {
-    return Commands.either(placeLogic(), prepCoral(), () -> coralReady);
-  }
-
-  public Command placeLogic() {
-    switch (wantedLevel) {
-      case L1:
-        return Commands.none();
-
-      case L2:
-        return placeL2();
-
-      case L3:
-        return placeL3();
-
-      case L4:
-        return placeL4();
-
-      default:
-        return prepCoral();
-    }
-  }
-
-  public Command scoreLogic() {
     return Commands.either(placeTrough(), releaseCoral(), () -> wantedLevel == scoringLevels.L1);
   }
 
@@ -472,12 +443,12 @@ public class RobotContainer {
 
   public Command maybeIntakeAlgae() {
     return Commands.either(
-        // run full intake sequence if no algae
-        intakeAlgae(),
         // Only prep if have algae
         prepAlgae(),
+        // run full intake sequence if no algae
+        intakeAlgae(),
         // boolean check
-        () -> !haveAlgae());
+        () -> haveAlgae());
   }
 
   public Command intakeAlgae() {
@@ -511,8 +482,8 @@ public class RobotContainer {
             elevator.changeSetpoint(ElevatorStates.PROCESSOR),
             wrist.changeSetpoint(WristStates.PROCESS),
             // Wait until at setpoints
-            Commands.waitUntil(() -> arm.atSetpoint()),
-            Commands.waitUntil(() -> elevator.atSetpoint()),
+            // Commands.waitUntil(() -> arm.atSetpoint()),
+            // Commands.waitUntil(() -> elevator.atSetpoint()),
             // update readiness
             Commands.runOnce(() -> processorReady = true))
         .onlyIf(() -> haveAlgae());
@@ -527,8 +498,8 @@ public class RobotContainer {
             elevator.changeSetpoint(ElevatorStates.BARGE),
             wrist.changeSetpoint(WristStates.ALGAE),
             // Wait until at setpoints
-            Commands.waitUntil(() -> arm.atSetpoint()),
-            Commands.waitUntil(() -> elevator.atSetpoint()),
+            // Commands.waitUntil(() -> arm.atSetpoint()),
+            // Commands.waitUntil(() -> elevator.atSetpoint()),
             // update readiness
             Commands.runOnce(() -> bargeReady = true))
         .onlyIf(() -> haveAlgae());
@@ -569,7 +540,7 @@ public class RobotContainer {
             // prep algae once we have it
             prepAlgae()),
         prepAlgae(),
-        () -> haveAlgae());
+        () -> !haveAlgae());
   }
 
   public Command executeAlgaeAction() {
@@ -621,7 +592,7 @@ public class RobotContainer {
     }
   }
 
-  Boolean haveCoral() {
+  boolean haveCoral() {
     if (intake.maybeHasCoral()) {
       return true;
     } else if (intake.hasCoral()) {

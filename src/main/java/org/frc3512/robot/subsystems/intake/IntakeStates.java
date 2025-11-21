@@ -9,7 +9,7 @@ public enum IntakeStates {
 
   PLACE(0.15, "Placing Coral"),
 
-  HOLD(0.25, "Holding Algae"),
+  HOLD(-0.2, "Holding Algae"),
 
   STOPPED(0.0, "Stopped");
 

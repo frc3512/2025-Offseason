@@ -14,8 +14,8 @@ public enum ArmStates {
   PREP_MID(-28, "Preping Mid"),
   PLACE_MID(-65, "Placing Mid"),
 
-  PREP_L4(-32, "Preping L4"),
-  PLACE_L4(-60, "Placing L4"),
+  PREP_L4(-35, "Preping L4"),
+  PLACE_L4(-65, "Placing L4"),
 
   TROUGH(-75, "Trough"),
 
